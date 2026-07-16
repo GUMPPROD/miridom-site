@@ -18,13 +18,13 @@
     font-weight="900"
     font-size="82"
     letter-spacing="-2"
-    fill="#0A0F0D">MiRiDom</text>
+    fill="#FFFFFF">MiRiDom</text>
 
   <!-- ── Partial circle arc (right side of logo) ── -->
   <!-- Arc goes from bottom-left (~200°) to top-right (~60°) clockwise -->
   <path
     d="M 430,98 A 52,52 0 1,1 464,26"
-    stroke="#0A0F0D"
+    stroke="#FFFFFF"
     stroke-width="4.5"
     stroke-linecap="round"
     fill="none"
@@ -47,6 +47,6 @@
     font-weight="400"
     font-size="13.5"
     letter-spacing="3.8"
-    fill="#0A0F0D"
+    fill="#FFFFFF"
     opacity="0.85">MINORITY RIGHTS DOMINICA</text>
 </svg>
