@@ -1,0 +1,18 @@
+[
+  {
+    "id": "e2fc5cdc-a079-4b6a-bb38-931ab50c769e",
+    "name": "Admin MiRiDom",
+    "email": "admin@miridom.org",
+    "password": "$2a$10$1HTPgJfp9DZY24EYtnosDubAZo7kKbfRz07Ckh6qANnMuqHqhMA0u",
+    "role": "admin",
+    "createdAt": "2026-04-14T06:05:20.189Z"
+  },
+  {
+    "id": "1f64640f-5aec-45d2-a578-55dc7d18ea52",
+    "name": "Admin Secours",
+    "email": "secours@miridom.org",
+    "password": "$2a$10$fjQ5R5efB5PcdDL0NR8AIOVW0cd5WIM.4V909YmTsz3uRN3JIoPCm",
+    "role": "admin",
+    "createdAt": "2026-04-14T23:30:33.023Z"
+  }
+]

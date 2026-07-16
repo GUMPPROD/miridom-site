@@ -1,0 +1,16 @@
+# Dépendances (réinstallées par Render)
+node_modules/
+backend/node_modules/
+
+# Logs et fichiers temporaires du partage local
+.server.log
+.tunnel.log
+.cloudflared
+cf.tgz
+
+# macOS
+.DS_Store
+
+# Scripts locaux (inutiles en ligne)
+LANCER_LE_SITE.command
+PARTAGER_EN_LIGNE.command

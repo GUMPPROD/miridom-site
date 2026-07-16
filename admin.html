@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MiRiDom — Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    .sidebar-link { display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:10px;font-size:14px;font-weight:500;color:#86efac;cursor:pointer;transition:all .15s;width:100%;text-align:left;background:transparent;border:none; }
+    .sidebar-link:hover { color:#fff;background:rgba(255,255,255,0.08); }
+    .sidebar-link.active { color:#fff;background:rgba(5,150,105,0.6); }
+    [data-section] { display:none; }
+    [data-section].active { display:block; }
+    .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:50;display:flex;align-items:center;justify-content:center; }
+    .modal-box { background:#fff;border-radius:20px;padding:32px;width:90%;max-width:680px;max-height:90vh;overflow-y:auto; }
+    .toast { position:fixed;bottom:24px;right:24px;z-index:999;padding:14px 20px;border-radius:12px;font-size:14px;font-weight:500;color:#fff;animation:slideIn .3s ease; }
+    @keyframes slideIn { from{transform:translateY(60px);opacity:0} to{transform:translateY(0);opacity:1} }
+    .form-input { width:100%;border:1.5px solid #D1D5DB;border-radius:10px;padding:10px 14px;font-size:14px;outline:none;transition:border-color .2s; }
+    .form-input:focus { border-color:#059669; }
+    .form-label { display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px; }
+    .editor { min-height:180px;border:1.5px solid #D1D5DB;border-radius:10px;padding:14px;outline:none;font-size:14px;line-height:1.7; }
+    .editor:focus { border-color:#059669; }
+    .btn-green { background:#059669;color:#fff;font-weight:600;font-size:14px;padding:10px 20px;border-radius:10px;border:none;cursor:pointer;transition:background .2s; }
+    .btn-green:hover { background:#047857; }
+    .btn-gray { background:#F3F4F6;color:#374151;font-weight:600;font-size:14px;padding:10px 20px;border-radius:10px;border:none;cursor:pointer; }
+    .btn-gray:hover { background:#E5E7EB; }
+    .btn-red { background:#FEF2F2;color:#DC2626;font-weight:600;font-size:12px;padding:6px 12px;border-radius:8px;border:none;cursor:pointer; }
+    .btn-red:hover { background:#FEE2E2; }
+    .upload-zone { border:2px dashed #D1D5DB;border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all .2s; }
+    .upload-zone:hover,.upload-zone.active { border-color:#059669;background:#F0FDF4; }
+    .data-table { width:100%;border-collapse:collapse; }
+    .data-table th { text-align:left;padding:12px 16px;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#6B7280;background:#F9FAFB;border-bottom:1px solid #E5E7EB; }
+    .data-table td { padding:14px 16px;font-size:14px;border-bottom:1px solid #F3F4F6;vertical-align:middle; }
+    .data-table tr:hover td { background:#F9FAFB; }
+    .badge-green { display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;background:#D1FAE5;color:#065F46; }
+    .badge-yellow { display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;background:#FEF3C7;color:#92400E; }
+    .badge-blue { display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;background:#DBEAFE;color:#1E40AF; }
+    .badge-purple { display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;background:#EDE9FE;color:#5B21B6; }
+    .radio-option { display:flex;align-items:center;gap:8px;padding:12px 16px;border:1.5px solid #E5E7EB;border-radius:10px;cursor:pointer;transition:all .2s;user-select:none; }
+    .radio-option.selected { border-color:#059669;background:#F0FDF4; }
+    .radio-option input { accent-color:#059669; }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- ── LOGIN ─────────────────────────────────────────────────────────────── -->
+<div id="loginPage" class="min-h-screen flex items-center justify-center" style="background:linear-gradient(135deg,#0A0F0D,#064E3B)">
+  <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-10 w-full max-w-sm border border-white/15 shadow-2xl">
+    <div class="text-center mb-8">
+      <img src="/logo.svg" alt="MiRiDom" class="h-10 mx-auto mb-4" style="filter:brightness(0) invert(1)" onerror="this.style.display='none'" />
+      <h1 class="text-2xl font-bold text-white">MiRiDom Admin</h1>
+      <p class="text-green-300 text-sm mt-1">Administration panel</p>
+    </div>
+    <form onsubmit="doLogin(event)">
+      <div class="mb-4">
+        <label class="block text-sm text-green-200 mb-2">Email</label>
+        <input id="loginEmail" type="email" value="admin@miridom.org" required class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 text-sm" />
+      </div>
+      <div class="mb-6">
+        <label class="block text-sm text-green-200 mb-2">Password</label>
+        <input id="loginPassword" type="password" required class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-green-400 text-sm" placeholder="••••••••" />
+      </div>
+      <button type="submit" id="loginBtn" class="w-full font-semibold py-3 rounded-xl text-sm text-white" style="background:#059669">Sign in</button>
+      <p id="loginError" class="text-red-300 text-xs text-center mt-3 hidden"></p>
+    </form>
+    <p class="text-center text-green-400 text-xs mt-6"><a href="/" class="hover:text-white">← Back to site</a></p>
+  </div>
+</div>
+
+<!-- ── APP ──────────────────────────────────────────────────────────────── -->
+<div id="app" style="display:none">
+  <div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="w-64 flex flex-col fixed top-0 left-0 h-screen z-10" style="background:#071210">
+      <div class="p-5 border-b border-white/8">
+        <div class="flex items-center gap-3">
+          <img src="/logo.svg" alt="MiRiDom" class="h-8" style="filter:brightness(0) invert(1)" onerror="this.style.display='none'" />
+        </div>
+      </div>
+      <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto">
+        <button onclick="showSection('dashboard')" class="sidebar-link active" data-nav="dashboard">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="2"/></svg>
+          Dashboard
+        </button>
+        <div class="px-3 pt-4 pb-1"><span class="text-xs font-semibold text-green-600 uppercase tracking-wider">Content</span></div>
+        <button onclick="showSection('actualites')" class="sidebar-link" data-nav="actualites">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          News <span id="nav-actu-badge" class="ml-auto text-xs bg-green-700 text-white px-1.5 py-0.5 rounded-full" style="display:none"></span>
+        </button>
+        <button onclick="showSection('resources')" class="sidebar-link" data-nav="resources">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+          Resources & Docs
+        </button>
+        <div class="px-3 pt-4 pb-1"><span class="text-xs font-semibold text-green-600 uppercase tracking-wider">Site</span></div>
+        <button onclick="showSection('messages')" class="sidebar-link" data-nav="messages">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          Messages <span id="nav-unread-badge" class="ml-auto text-xs bg-red-500 text-white px-1.5 py-0.5 rounded-full" style="display:none"></span>
+        </button>
+        <button onclick="showSection('pages')" class="sidebar-link" data-nav="pages">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+          Site pages
+        </button>
+        <button onclick="showSection('settings')" class="sidebar-link" data-nav="settings">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3" stroke-width="2"/></svg>
+          Settings
+        </button>
+      </nav>
+      <div class="p-4 border-t border-white/8">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style="background:#059669"><span id="userInitial">A</span></div>
+          <div class="flex-1 min-w-0">
+            <div class="text-white text-xs font-semibold truncate" id="userName">Admin</div>
+            <div class="text-green-400 text-xs truncate" id="userEmail"></div>
+          </div>
+        </div>
+        <button onclick="logout()" class="w-full text-left text-green-400 hover:text-white text-xs flex items-center gap-2 py-1 bg-transparent border-none cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          Log out
+        </button>
+        <a href="/" class="flex items-center gap-2 text-green-400 hover:text-white text-xs py-1 mt-0.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          View site
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="ml-64 flex-1 p-8">
+
+      <!-- ── DASHBOARD ── -->
+      <section data-section="dashboard" class="active">
+        <div class="flex items-center justify-between mb-8">
+          <div><h2 class="text-2xl font-bold text-gray-900">Dashboard</h2><p class="text-gray-500 text-sm mt-1">Overview</p></div>
+          <a href="/" target="_blank" class="btn-gray flex items-center gap-2 text-sm">↗ View site</a>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm"><p class="text-xs text-gray-400 uppercase tracking-wider mb-2">News</p><p class="text-3xl font-bold text-gray-900" id="stat-articles">—</p><p class="text-xs text-gray-400 mt-1" id="stat-articles-sub">…</p></div>
+          <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm"><p class="text-xs text-gray-400 uppercase tracking-wider mb-2">Resources</p><p class="text-3xl font-bold text-gray-900" id="stat-resources">—</p><p class="text-xs text-gray-400 mt-1">online</p></div>
+          <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm"><p class="text-xs text-gray-400 uppercase tracking-wider mb-2">Documents</p><p class="text-3xl font-bold text-gray-900" id="stat-docs">—</p><p class="text-xs text-gray-400 mt-1">files</p></div>
+          <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm"><p class="text-xs text-gray-400 uppercase tracking-wider mb-2">Messages</p><p class="text-3xl font-bold text-gray-900" id="stat-messages">—</p><p class="text-xs text-gray-400 mt-1" id="stat-messages-sub">…</p></div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+            <h3 class="font-semibold text-gray-900 mb-4 flex items-center justify-between">Latest news <button onclick="showSection('actualites')" class="text-xs text-green-600 font-normal">View all →</button></h3>
+            <div id="dash-actu" class="text-sm text-gray-400">Loading…</div>
+          </div>
+          <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+            <h3 class="font-semibold text-gray-900 mb-4 flex items-center justify-between">Recent messages <button onclick="showSection('messages')" class="text-xs text-green-600 font-normal">View all →</button></h3>
+            <div id="dash-messages" class="text-sm text-gray-400">Loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── NEWS ── -->
+      <section data-section="actualites">
+        <div class="flex items-center justify-between mb-8">
+          <div><h2 class="text-2xl font-bold text-gray-900">News</h2><p class="text-gray-500 text-sm mt-1">Short and recent content</p></div>
+          <button onclick="openActuModal(null)" class="btn-green">+ New article</button>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div id="actualites-list"><div class="p-12 text-center text-gray-400">Loading…</div></div>
+        </div>
+      </section>
+
+      <!-- ── RESOURCES & DOCUMENTS ── -->
+      <section data-section="resources">
+        <div class="flex items-center justify-between mb-6">
+          <div><h2 class="text-2xl font-bold text-gray-900">Resources & Documents</h2><p class="text-gray-500 text-sm mt-1">External links and downloadable files</p></div>
+          <button onclick="openResourceModal(null)" class="btn-green">+ Add</button>
+        </div>
+        <!-- Filters -->
+        <div class="flex gap-2 mb-6">
+          <button onclick="filterResView('')" id="filter-all" class="px-4 py-2 rounded-full text-sm font-semibold border-2 border-green-600 text-green-600 bg-white">All</button>
+          <button onclick="filterResView('lien')" id="filter-lien" class="px-4 py-2 rounded-full text-sm font-medium border border-gray-200 text-gray-500 bg-white hover:border-green-400">Links</button>
+          <button onclick="filterResView('document')" id="filter-doc" class="px-4 py-2 rounded-full text-sm font-medium border border-gray-200 text-gray-500 bg-white hover:border-green-400">Documents</button>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div id="resources-list"><div class="p-12 text-center text-gray-400">Loading…</div></div>
+        </div>
+      </section>
+
+      <!-- ── MESSAGES ── -->
+      <section data-section="messages">
+        <div class="mb-8"><h2 class="text-2xl font-bold text-gray-900">Messages</h2><p class="text-gray-500 text-sm mt-1">Contact form</p></div>
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div id="messages-list"><div class="p-12 text-center text-gray-400">Loading…</div></div>
+        </div>
+      </section>
+
+      <!-- ── PAGES ── -->
+      <section data-section="pages">
+        <div class="mb-8"><h2 class="text-2xl font-bold text-gray-900">Site pages</h2><p class="text-gray-500 text-sm mt-1">Edit the main texts</p></div>
+        <div class="space-y-6">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h3 class="font-semibold text-gray-900 mb-5">Home</h3>
+            <div class="space-y-4">
+              <div><label class="form-label">Main title</label><input id="pg-home-heroTitle" class="form-input" /></div>
+              <div><label class="form-label">Subtitle</label><textarea id="pg-home-heroSubtitle" rows="3" class="form-input resize-none"></textarea></div>
+              <div><label class="form-label">Mission text</label><textarea id="pg-home-missionText" rows="4" class="form-input resize-none"></textarea></div>
+              <button onclick="savePage('home',{heroTitle:v('pg-home-heroTitle'),heroSubtitle:v('pg-home-heroSubtitle'),missionText:v('pg-home-missionText')})" class="btn-green">Save</button>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h3 class="font-semibold text-gray-900 mb-5">About</h3>
+            <div class="space-y-4">
+              <div><label class="form-label">Mission</label><textarea id="pg-about-mission" rows="3" class="form-input resize-none"></textarea></div>
+              <div><label class="form-label">Vision</label><textarea id="pg-about-vision" rows="3" class="form-input resize-none"></textarea></div>
+              <div><label class="form-label">Overview</label><textarea id="pg-about-content" rows="5" class="form-input resize-none"></textarea></div>
+              <button onclick="savePage('about',{mission:v('pg-about-mission'),vision:v('pg-about-vision'),content:v('pg-about-content')})" class="btn-green">Save</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SETTINGS ── -->
+      <section data-section="settings">
+        <div class="mb-8"><h2 class="text-2xl font-bold text-gray-900">Settings</h2><p class="text-gray-500 text-sm mt-1">Account and security</p></div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h3 class="font-semibold text-gray-900 mb-5">Change password</h3>
+            <div class="space-y-4">
+              <div><label class="form-label">Current password</label><input id="pwd-current" type="password" class="form-input" placeholder="••••••••" /></div>
+              <div><label class="form-label">New password</label><input id="pwd-new" type="password" class="form-input" placeholder="••••••••" /></div>
+              <div><label class="form-label">Confirm</label><input id="pwd-confirm" type="password" class="form-input" placeholder="••••••••" /></div>
+              <p id="pwd-error" class="text-red-500 text-sm hidden"></p>
+              <p id="pwd-success" class="text-green-600 text-sm hidden">✓ Password changed</p>
+              <button onclick="changePassword()" class="btn-green">Update</button>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h3 class="font-semibold text-gray-900 mb-5">Backup admin account</h3>
+            <div class="bg-green-50 rounded-xl p-4 text-sm space-y-3">
+              <p class="text-gray-600">Use this account if you lose access to the main one.</p>
+              <div class="bg-white rounded-lg p-3 border border-green-200 font-mono text-xs space-y-1">
+                <div><span class="text-gray-400">Email: </span><span class="font-semibold">secours@miridom.org</span></div>
+                <div><span class="text-gray-400">Password: </span><span class="font-semibold">MiRiDom#Secours2025!</span></div>
+              </div>
+              <p class="text-orange-600 text-xs">⚠️ Keep this information in a safe place.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── ARTICLE MODAL ── -->
+<div id="actuModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-bold text-gray-900" id="actu-modal-title">New article</h3>
+      <button onclick="document.getElementById('actuModal').style.display='none'" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+    </div>
+    <input type="hidden" id="actu-id" />
+    <div class="space-y-4">
+      <div><label class="form-label">Title *</label><input id="actu-title" type="text" class="form-input" /></div>
+      <div><label class="form-label">Status</label>
+        <select id="actu-status" class="form-input"><option value="draft">Draft</option><option value="published">Published</option></select>
+      </div>
+      <div><label class="form-label">Date</label><input id="actu-date" type="date" class="form-input" /></div>
+      <div><label class="form-label">Excerpt *</label><textarea id="actu-excerpt" rows="3" class="form-input resize-none"></textarea></div>
+      <div><label class="form-label">Full content (optional)</label>
+        <div class="border border-gray-200 rounded-xl overflow-hidden">
+          <div class="bg-gray-50 border-b border-gray-200 px-3 py-2 flex gap-1">
+            <button type="button" onclick="fmt('actu-content','bold')" class="px-2 py-1 text-xs rounded hover:bg-gray-200 font-bold">G</button>
+            <button type="button" onclick="fmt('actu-content','italic')" class="px-2 py-1 text-xs rounded hover:bg-gray-200 italic">I</button>
+            <button type="button" onclick="fmt('actu-content','underline')" class="px-2 py-1 text-xs rounded hover:bg-gray-200 underline">S</button>
+          </div>
+          <div id="actu-content" contenteditable="true" class="editor"></div>
+        </div>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button onclick="saveActu()" class="btn-green flex-1">Save</button>
+        <button onclick="document.getElementById('actuModal').style.display='none'" class="btn-gray">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── RESOURCE MODAL (with file upload) ── -->
+<div id="resourceModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-bold text-gray-900" id="res-modal-title">New resource</h3>
+      <button onclick="document.getElementById('resourceModal').style.display='none'" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+    </div>
+    <input type="hidden" id="res-id" />
+    <div class="space-y-4">
+      <div><label class="form-label">Title *</label><input id="res-title" type="text" class="form-input" /></div>
+      <div><label class="form-label">Description</label><textarea id="res-description" rows="2" class="form-input resize-none"></textarea></div>
+
+      <!-- Type: Link or File -->
+      <div>
+        <label class="form-label">Resource type</label>
+        <div class="grid grid-cols-2 gap-3">
+          <label class="radio-option selected" id="type-link-opt">
+            <input type="radio" name="res-type-radio" value="lien" checked onchange="toggleResType('lien')" />
+            <div>
+              <div class="font-semibold text-sm text-gray-800">🔗 External link</div>
+              <div class="text-xs text-gray-500">URL to an online site or resource</div>
+            </div>
+          </label>
+          <label class="radio-option" id="type-file-opt">
+            <input type="radio" name="res-type-radio" value="document" onchange="toggleResType('document')" />
+            <div>
+              <div class="font-semibold text-sm text-gray-800">📄 Document</div>
+              <div class="text-xs text-gray-500">Downloadable PDF, DOCX file</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- URL field (visible if link) -->
+      <div id="res-url-block">
+        <label class="form-label">URL</label>
+        <input id="res-url" type="text" class="form-input" placeholder="https://…" />
+      </div>
+
+      <!-- File upload (visible if document) -->
+      <div id="res-file-block" style="display:none">
+        <label class="form-label">File</label>
+        <div class="upload-zone" id="res-upload-zone" onclick="document.getElementById('res-file-input').click()">
+          <svg class="w-7 h-7 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          <p class="text-sm text-gray-500" id="res-upload-label">Click to select a file</p>
+          <p class="text-xs text-gray-400 mt-1">PDF, DOCX, XLSX, etc. — max 20 MB</p>
+        </div>
+        <input type="file" id="res-file-input" class="hidden" onchange="handleResFileSelect(event)" />
+        <div id="res-current-file" class="hidden mt-2 p-3 bg-green-50 rounded-lg border border-green-200 text-sm text-green-800 font-medium"></div>
+      </div>
+
+      <div><label class="form-label">Status</label>
+        <select id="res-status" class="form-input"><option value="active">Active (visible)</option><option value="inactive">Inactive</option></select>
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <button onclick="saveResource()" class="btn-green flex-1">Save</button>
+        <button onclick="document.getElementById('resourceModal').style.display='none'" class="btn-gray">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL MESSAGE ── -->
+<div id="msgModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box max-w-lg">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-bold text-gray-900">Received message</h3>
+      <button onclick="document.getElementById('msgModal').style.display='none'" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+    </div>
+    <div id="msg-modal-body" class="space-y-4 text-sm text-gray-700"></div>
+  </div>
+</div>
+
+<script>
+// ── API ───────────────────────────────────────────────────────────────────
+const API = window.location.origin;
+const token = () => sessionStorage.getItem('miridom_token');
+
+async function apiFetch(method, path, body) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (token()) opts.headers['Authorization'] = 'Bearer ' + token();
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API + path, opts);
+  if (r.status === 401) { logout(); return null; }
+  if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.error || r.statusText); }
+  return r.json();
+}
+
+// ── Boot ─────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  const t = token();
+  if (!t) { showLogin(); return; }
+  try { const me = await apiFetch('GET', '/api/auth/me'); if (me) initApp(me); else showLogin(); }
+  catch { showLogin(); }
+});
+
+function showLogin() {
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+function initApp(user) {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('userName').textContent    = user.name || 'Admin';
+  document.getElementById('userEmail').textContent   = user.email;
+  document.getElementById('userInitial').textContent = (user.name || 'A')[0].toUpperCase();
+  loadDashboard(); loadActualites(); loadResources(); loadMessages(); loadPages();
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────
+async function doLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('loginError');
+  btn.textContent = 'Signing in…'; btn.disabled = true; err.classList.add('hidden');
+  try {
+    const d = await apiFetch('POST', '/api/auth/login', { email: document.getElementById('loginEmail').value, password: document.getElementById('loginPassword').value });
+    if (!d) return;
+    sessionStorage.setItem('miridom_token', d.token);
+    initApp(d.user);
+  } catch(ex) { err.textContent = ex.message; err.classList.remove('hidden'); }
+  btn.textContent = 'Sign in'; btn.disabled = false;
+}
+
+function logout() { sessionStorage.removeItem('miridom_token'); showLogin(); }
+
+async function changePassword() {
+  const cur = document.getElementById('pwd-current').value;
+  const nw  = document.getElementById('pwd-new').value;
+  const cnf = document.getElementById('pwd-confirm').value;
+  const err = document.getElementById('pwd-error');
+  const suc = document.getElementById('pwd-success');
+  err.classList.add('hidden'); suc.classList.add('hidden');
+  if (!cur || !nw) { err.textContent = 'Fill in all fields'; err.classList.remove('hidden'); return; }
+  if (nw !== cnf)  { err.textContent = 'The passwords do not match'; err.classList.remove('hidden'); return; }
+  try {
+    await apiFetch('POST', '/api/auth/change-password', { currentPassword: cur, newPassword: nw });
+    suc.classList.remove('hidden');
+    document.getElementById('pwd-current').value = document.getElementById('pwd-new').value = document.getElementById('pwd-confirm').value = '';
+  } catch(ex) { err.textContent = ex.message; err.classList.remove('hidden'); }
+}
+
+// ── Nav ───────────────────────────────────────────────────────────────────
+function showSection(name) {
+  document.querySelectorAll('[data-section]').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('[data-nav]').forEach(el => el.classList.remove('active'));
+  const sec = document.querySelector('[data-section="' + name + '"]');
+  const nav = document.querySelector('[data-nav="' + name + '"]');
+  if (sec) sec.classList.add('active');
+  if (nav) nav.classList.add('active');
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const s = await apiFetch('GET', '/api/stats');
+    if (!s) return;
+    document.getElementById('stat-articles').textContent = s.articles;
+    document.getElementById('stat-articles-sub').textContent = s.articlesPublished + ' published';
+    document.getElementById('stat-resources').textContent = s.resources;
+    document.getElementById('stat-docs').textContent = s.documents;
+    document.getElementById('stat-messages').textContent = s.messages;
+    document.getElementById('stat-messages-sub').textContent = s.unreadMessages > 0 ? '⚠️ ' + s.unreadMessages + ' unread' : 'All read';
+    if (s.unreadMessages > 0) { const b=document.getElementById('nav-unread-badge'); b.textContent=s.unreadMessages; b.style.display='inline'; }
+  } catch {}
+
+  try {
+    const arts = await apiFetch('GET', '/api/articles') || [];
+    document.getElementById('dash-actu').innerHTML = arts.slice(0,3).map(a =>
+      '<div class="flex justify-between py-2 border-b border-gray-50 last:border-0"><span class="text-gray-800 text-sm truncate">' + esc(a.title) + '</span><span class="ml-2 flex-shrink-0 ' + (a.status==='published'?'badge-green':'badge-yellow') + '">' + (a.status==='published'?'Published':'Draft') + '</span></div>'
+    ).join('') || '<p class="text-gray-400">No articles</p>';
+  } catch {}
+
+  try {
+    const msgs = await apiFetch('GET', '/api/messages') || [];
+    document.getElementById('dash-messages').innerHTML = msgs.slice(0,3).map(m =>
+      '<div class="flex items-center justify-between py-2 border-b border-gray-50 last:border-0 gap-2"><span class="text-gray-800 text-sm truncate ' + (!m.read?'font-semibold':'') + '">' + esc(m.name) + '</span>' + (!m.read?'<span class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></span>':'') + '</div>'
+    ).join('') || '<p class="text-gray-400">No messages</p>';
+  } catch {}
+}
+
+function makeTable(cols, rows) {
+  return '<table class="data-table"><thead><tr>' + cols.map(c=>'<th>'+c+'</th>').join('') + '<th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+// ── NEWS ───────────────────────────────────────────────────────────────────
+let _actus = [];
+async function loadActualites() {
+  try { _actus = await apiFetch('GET', '/api/articles') || []; renderActus(); }
+  catch(e) { document.getElementById('actualites-list').innerHTML = err(e.message); }
+}
+
+function renderActus() {
+  const el = document.getElementById('actualites-list');
+  if (!_actus.length) { el.innerHTML = '<div class="p-12 text-center text-gray-400"><p class="mb-3">No articles</p><button onclick="openActuModal(null)" class="btn-green">Create the first one</button></div>'; return; }
+  el.innerHTML = makeTable(['Title','Date','Status'], _actus.map(a =>
+    '<tr><td class="font-medium text-gray-900 max-w-xs"><div class="truncate">' + esc(a.title) + '</div><div class="text-xs text-gray-400 truncate">' + esc(a.excerpt||'').substring(0,70) + '</div></td>' +
+    '<td class="text-gray-500 text-sm">' + a.date + '</td>' +
+    '<td><span class="' + (a.status==='published'?'badge-green':'badge-yellow') + '">' + (a.status==='published'?'Published':'Draft') + '</span></td>' +
+    '<td><div class="flex gap-2 justify-end">' +
+    '<button onclick="editActu(\'' + a.id + '\')" class="text-green-600 text-xs font-medium hover:text-green-800">Edit</button>' +
+    '<button onclick="toggleStatus(\'articles\',\'' + a.id + '\',\'' + a.status + '\')" class="text-gray-400 text-xs hover:text-gray-600">' + (a.status==='published'?'Unpublish':'Publish') + '</button>' +
+    '<button onclick="deleteItem(\'articles\',\'' + a.id + '\')" class="btn-red">Delete</button></div></td></tr>'
+  ).join(''));
+}
+
+function openActuModal(a) {
+  document.getElementById('actu-modal-title').textContent = a ? 'Edit' : 'New article';
+  sv('actu-id', a?.id||''); sv('actu-title', a?.title||'');
+  sv('actu-status', a?.status||'draft'); sv('actu-date', a?.date||today()); sv('actu-excerpt', a?.excerpt||'');
+  document.getElementById('actu-content').innerHTML = a?.content||'';
+  document.getElementById('actuModal').style.display = 'flex';
+}
+function editActu(id) { openActuModal(_actus.find(a=>a.id===id)); }
+async function saveActu() {
+  const id = v('actu-id');
+  const body = { title:v('actu-title'), status:v('actu-status'), date:v('actu-date'), excerpt:v('actu-excerpt'), content:document.getElementById('actu-content').innerHTML };
+  if (!body.title) { toast('Title required','red'); return; }
+  try { if(id) await apiFetch('PUT','/api/articles/'+id,body); else await apiFetch('POST','/api/articles',body); document.getElementById('actuModal').style.display='none'; toast('Saved ✓'); loadActualites(); loadDashboard(); } catch(e) { toast(e.message,'red'); }
+}
+
+// ── RESOURCES & DOCUMENTS ──────────────────────────────────────────────────
+let _resources = [];
+let _resFilter = '';
+let _pendingFile = null;
+
+async function loadResources() {
+  try { _resources = await apiFetch('GET', '/api/resources') || []; renderResources(); }
+  catch(e) { document.getElementById('resources-list').innerHTML = err(e.message); }
+}
+
+function filterResView(type) {
+  _resFilter = type;
+  // Update filter buttons
+  document.querySelectorAll('[id^="filter-"]').forEach(b => {
+    b.className = 'px-4 py-2 rounded-full text-sm font-medium border border-gray-200 text-gray-500 bg-white hover:border-green-400';
+  });
+  const activeId = type === '' ? 'filter-all' : 'filter-' + type;
+  const active = document.getElementById(activeId);
+  if (active) active.className = 'px-4 py-2 rounded-full text-sm font-semibold border-2 border-green-600 text-green-600 bg-white';
+  renderResources();
+}
+
+function renderResources() {
+  const el = document.getElementById('resources-list');
+  let list = _resources;
+  if (_resFilter === 'lien')     list = list.filter(r => !r.filename);
+  if (_resFilter === 'document') list = list.filter(r => !!r.filename);
+  if (!list.length) {
+    el.innerHTML = '<div class="p-12 text-center text-gray-400"><p class="mb-3">No resources</p><button onclick="openResourceModal(null)" class="btn-green">Add</button></div>'; return;
+  }
+  el.innerHTML = makeTable(['Title','Type','Access','Status'], list.map(r => {
+    const isFile = !!r.filename;
+    const badge = isFile ? '<span class="badge-purple">Document</span>' : '<span class="badge-blue">Link</span>';
+    const access = isFile
+      ? `<a href="${r.url}" target="_blank" download class="text-green-600 text-xs font-medium hover:underline">⬇ Download</a>`
+      : (r.url && r.url !== '#' && r.url !== ''
+          ? `<a href="${r.url}" target="_blank" class="text-blue-600 text-xs font-medium hover:underline">↗ Open</a>`
+          : '<span class="text-gray-300 text-xs">—</span>');
+    return '<tr>' +
+      '<td class="font-medium text-gray-900 max-w-xs"><div class="truncate">' + esc(r.title) + '</div><div class="text-xs text-gray-400 truncate">' + esc(r.description||'') + '</div></td>' +
+      '<td>' + badge + '</td>' +
+      '<td>' + access + '</td>' +
+      '<td><span class="' + (r.status==='active'?'badge-green':'badge-yellow') + '">' + (r.status==='active'?'Active':'Inactive') + '</span></td>' +
+      '<td><div class="flex gap-2 justify-end"><button onclick="editResource(\'' + r.id + '\')" class="text-green-600 text-xs font-medium hover:text-green-800">Edit</button><button onclick="deleteItem(\'resources\',\'' + r.id + '\')" class="btn-red">Delete</button></div></td></tr>';
+  }).join(''));
+}
+
+function openResourceModal(r) {
+  document.getElementById('res-modal-title').textContent = r ? 'Edit resource' : 'New resource';
+  sv('res-id', r?.id||''); sv('res-title', r?.title||''); sv('res-description', r?.description||'');
+  sv('res-url', r?.url||''); sv('res-status', r?.status||'active');
+  _pendingFile = null;
+  document.getElementById('res-upload-label').textContent = 'Click to select a file';
+  document.getElementById('res-upload-zone').className = 'upload-zone';
+
+  // Detect whether it's a file or a link
+  const isFile = !!r?.filename;
+  toggleResType(isFile ? 'document' : 'lien');
+  document.querySelector('input[value="' + (isFile?'document':'lien') + '"]').checked = true;
+
+  if (r?.filename) {
+    const cur = document.getElementById('res-current-file');
+    cur.classList.remove('hidden');
+    cur.textContent = '📎 Current file: ' + (r.originalFilename || r.filename);
+  } else {
+    document.getElementById('res-current-file').classList.add('hidden');
+  }
+
+  document.getElementById('resourceModal').style.display = 'flex';
+}
+
+function editResource(id) { openResourceModal(_resources.find(r=>r.id===id)); }
+
+function toggleResType(type) {
+  const isLink = type === 'lien';
+  document.getElementById('res-url-block').style.display  = isLink ? 'block' : 'none';
+  document.getElementById('res-file-block').style.display = isLink ? 'none'  : 'block';
+  document.getElementById('type-link-opt').classList.toggle('selected', isLink);
+  document.getElementById('type-file-opt').classList.toggle('selected', !isLink);
+}
+
+function handleResFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 20 * 1024 * 1024) { toast('File too large (max 20 MB)', 'red'); return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    _pendingFile = { filename: file.name, filedata: e.target.result.split(',')[1], mimetype: file.type };
+    document.getElementById('res-upload-label').textContent = '✓ ' + file.name + ' (' + fmtSize(file.size) + ')';
+    document.getElementById('res-upload-zone').className = 'upload-zone active';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveResource() {
+  const id   = v('res-id');
+  const type = document.querySelector('input[name="res-type-radio"]:checked')?.value || 'lien';
+  const body = {
+    title:       v('res-title'),
+    description: v('res-description'),
+    status:      v('res-status'),
+    type:        type
+  };
+  if (!body.title) { toast('Title required','red'); return; }
+
+  if (type === 'lien') {
+    body.url = v('res-url');
+  } else if (_pendingFile) {
+    Object.assign(body, _pendingFile);
+  }
+  // If type=document but no new file → keep the existing one (no file update)
+
+  try {
+    if (id) await apiFetch('PUT', '/api/resources/'+id, body);
+    else    await apiFetch('POST', '/api/resources', body);
+    document.getElementById('resourceModal').style.display = 'none';
+    toast('Resource saved ✓');
+    loadResources(); loadDashboard();
+  } catch(e) { toast(e.message,'red'); }
+}
+
+// ── MESSAGES ─────────────────────────────────────────────────────────────
+let _messages = [];
+async function loadMessages() {
+  try { _messages = await apiFetch('GET', '/api/messages') || []; renderMessages(); const u=_messages.filter(m=>!m.read).length; const b=document.getElementById('nav-unread-badge'); if(u>0){b.textContent=u;b.style.display='inline';}else b.style.display='none'; }
+  catch {}
+}
+
+function renderMessages() {
+  const el = document.getElementById('messages-list');
+  if (!_messages.length) { el.innerHTML = '<div class="p-12 text-center text-gray-400">No messages received</div>'; return; }
+  el.innerHTML = makeTable(['Sender','Subject','Date'], _messages.map(m =>
+    '<tr class="' + (!m.read?'bg-green-50/30':'') + '">' +
+    '<td class="font-medium ' + (!m.read?'font-semibold':'') + ' text-gray-900">' + esc(m.name) + '<div class="text-xs text-gray-400">' + esc(m.email) + '</div></td>' +
+    '<td class="text-gray-700 text-sm">' + esc(m.subject) + '</td>' +
+    '<td class="text-gray-400 text-xs">' + new Date(m.createdAt).toLocaleDateString('en-US') + '</td>' +
+    '<td><div class="flex items-center gap-2 justify-end">' + (!m.read?'<span class="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></span>':'') +
+    '<button onclick="viewMessage(\'' + m.id + '\')" class="text-green-600 text-xs font-medium hover:text-green-800">Read</button>' +
+    '<button onclick="deleteItem(\'messages\',\'' + m.id + '\')" class="btn-red">Delete</button></div></td></tr>'
+  ).join(''));
+}
+
+async function viewMessage(id) {
+  const m = _messages.find(m=>m.id===id);
+  if (!m) return;
+  document.getElementById('msg-modal-body').innerHTML =
+    '<div class="bg-gray-50 rounded-xl p-4"><div class="flex justify-between items-start"><div><p class="font-semibold">' + esc(m.name) + '</p><p class="text-gray-500 text-xs">' + esc(m.email) + '</p></div><p class="text-gray-400 text-xs">' + new Date(m.createdAt).toLocaleString('en-US') + '</p></div><p class="font-medium mt-2 text-gray-800">Subject: ' + esc(m.subject) + '</p></div>' +
+    '<div class="bg-white border border-gray-100 rounded-xl p-4 whitespace-pre-wrap min-h-16">' + esc(m.message) + '</div>' +
+    '<div class="flex gap-3"><a href="mailto:' + esc(m.email) + '?subject=Re: ' + esc(m.subject) + '" class="btn-green text-center flex-1" style="display:block;text-decoration:none">Reply by email</a><button onclick="markRead(\'' + m.id + '\');document.getElementById(\'msgModal\').style.display=\'none\'" class="btn-gray">Mark as read</button></div>';
+  document.getElementById('msgModal').style.display = 'flex';
+  if (!m.read) markRead(id);
+}
+
+async function markRead(id) {
+  try { await apiFetch('PUT','/api/messages/'+id,{read:true}); const m=_messages.find(m=>m.id===id); if(m) m.read=true; renderMessages(); const u=_messages.filter(m=>!m.read).length; const b=document.getElementById('nav-unread-badge'); if(u>0){b.textContent=u;b.style.display='inline';}else b.style.display='none'; } catch {}
+}
+
+// ── PAGES ─────────────────────────────────────────────────────────────────
+async function loadPages() {
+  try {
+    const pages = await apiFetch('GET', '/api/pages') || [];
+    const h = pages.find(p=>p.slug==='home')  || {};
+    const a = pages.find(p=>p.slug==='about') || {};
+    sv2('pg-home-heroTitle', h.heroTitle||''); sv2('pg-home-heroSubtitle', h.heroSubtitle||''); sv2('pg-home-missionText', h.missionText||'');
+    sv2('pg-about-mission', a.mission||''); sv2('pg-about-vision', a.vision||''); sv2('pg-about-content', a.content||'');
+  } catch {}
+}
+
+async function savePage(slug, body) {
+  try { await apiFetch('PUT','/api/pages/'+slug,body); toast('Page saved ✓'); }
+  catch(e) { toast(e.message,'red'); }
+}
+
+// ── Generic ───────────────────────────────────────────────────────────────
+async function toggleStatus(type, id, status) {
+  try { await apiFetch('PUT','/api/'+type+'/'+id,{status:status==='published'?'draft':'published'}); toast('Status updated'); if(type==='articles') loadActualites(); }
+  catch(e) { toast(e.message,'red'); }
+}
+
+async function deleteItem(type, id) {
+  if (!confirm('Delete permanently?')) return;
+  try {
+    await apiFetch('DELETE','/api/'+type+'/'+id); toast('Deleted');
+    if (type==='articles') { loadActualites(); loadDashboard(); }
+    if (type==='resources') { loadResources(); loadDashboard(); }
+    if (type==='messages') loadMessages();
+  } catch(e) { toast(e.message,'red'); }
+}
+
+// ── Editor ────────────────────────────────────────────────────────────────
+function fmt(elId, cmd) { document.getElementById(elId).focus(); document.execCommand(cmd,false,null); }
+
+// ── Utils ─────────────────────────────────────────────────────────────────
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function v(id) { return document.getElementById(id)?.value||''; }
+function sv(id, val) { const el=document.getElementById(id); if(!el) return; if(el.tagName==='SELECT'){[...el.options].forEach(o=>{ if(o.value===val) el.value=val; });}else el.value=val; }
+function sv2(id, val) { const el=document.getElementById(id); if(el) el.value=val; }
+function today() { return new Date().toISOString().split('T')[0]; }
+function fmtSize(b) { if(b<1024) return b+'B'; if(b<1048576) return (b/1024).toFixed(0)+'KB'; return (b/1048576).toFixed(1)+'MB'; }
+function err(msg) { return '<div class="p-8 text-center text-red-500 text-sm">' + esc(msg) + '</div>'; }
+
+let _toastTimer;
+function toast(msg, color) {
+  clearTimeout(_toastTimer);
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.style.background = color==='red'?'#dc2626':'#059669';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  _toastTimer = setTimeout(()=>t.remove(), 3500);
+}
+</script>
+</body>
+</html>

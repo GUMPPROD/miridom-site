@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MiRiDom — Minority Rights Dominica</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --accent: #059669;
+      --accent-light: #34D399;
+      --dark: #0A0F0D;
+      --dark-2: #0F1A15;
+    }
+    * { font-family: 'Inter', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    /* ── Pages SPA ── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── Nav ── */
+    #main-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 20px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: all .4s ease;
+    }
+    #main-nav.scrolled {
+      background: rgba(10,10,20,0.95);
+      backdrop-filter: blur(20px);
+      padding: 14px 40px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+    .nav-logo .logo-mark {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, #059669, #047857);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px; color: white; letter-spacing: -0.5px;
+    }
+    .nav-logo .logo-text { font-weight: 700; font-size: 18px; color: white; }
+    .nav-logo .logo-sub { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 0.5px; }
+    .nav-links { display: flex; align-items: center; gap: 4px; }
+    .nav-link {
+      color: rgba(255,255,255,0.75);
+      font-size: 14px; font-weight: 500;
+      padding: 8px 16px; border-radius: 100px;
+      cursor: pointer; transition: all .2s;
+      background: transparent; border: none;
+    }
+    .nav-link:hover { color: white; background: rgba(255,255,255,0.08); }
+    .nav-link.active { color: white; }
+    .btn-nav-cta {
+      background: white; color: #0A0A14;
+      font-size: 14px; font-weight: 600;
+      padding: 10px 22px; border-radius: 100px;
+      cursor: pointer; transition: all .2s;
+      border: none;
+    }
+    .btn-nav-cta:hover { background: rgba(255,255,255,0.9); transform: translateY(-1px); }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative; width: 100%; height: 100vh; min-height: 700px;
+      overflow: hidden; display: flex; align-items: flex-end;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      transform: scale(1.05);
+      transition: transform 8s ease;
+    }
+    .hero:hover .hero-bg { transform: scale(1); }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(10,10,20,0.95) 0%,
+        rgba(10,10,20,0.5) 45%,
+        rgba(10,10,20,0.15) 100%
+      );
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      padding: 0 60px 80px;
+      max-width: 800px;
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(5,150,105,0.3);
+      border: 1px solid rgba(5,150,105,0.4);
+      backdrop-filter: blur(10px);
+      color: #34D399; font-size: 12px; font-weight: 600;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 6px 16px; border-radius: 100px;
+      margin-bottom: 28px;
+    }
+    .hero-tag::before { content: ''; width: 6px; height: 6px; background: #059669; border-radius: 50%; }
+    .hero-h1 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(52px, 7vw, 88px);
+      font-weight: 800; line-height: 1.0;
+      color: white; letter-spacing: -2px;
+      margin-bottom: 24px;
+    }
+    .hero-h1 .highlight {
+      color: #6EE7B7;
+    }
+    .hero-sub {
+      font-size: 17px; line-height: 1.7;
+      color: rgba(255,255,255,0.65);
+      max-width: 560px; margin-bottom: 40px;
+    }
+    .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-primary-hero {
+      background: white; color: #0A0A14;
+      font-weight: 700; font-size: 15px;
+      padding: 16px 32px; border-radius: 100px;
+      cursor: pointer; border: none;
+      transition: all .25s; letter-spacing: -0.2px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-primary-hero:hover { background: rgba(255,255,255,0.9); transform: translateY(-2px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+    .btn-secondary-hero {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      color: white; font-weight: 600; font-size: 15px;
+      padding: 16px 32px; border-radius: 100px;
+      cursor: pointer; transition: all .25s;
+    }
+    .btn-secondary-hero:hover { background: rgba(255,255,255,0.18); }
+    .hero-scroll {
+      position: absolute; bottom: 30px; right: 60px; z-index: 2;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: rgba(255,255,255,0.4); font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    }
+    .hero-scroll-line {
+      width: 1px; height: 60px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+    /* ── Stats ── */
+    .stats-strip {
+      background: #071210;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .stat-item { text-align: center; padding: 52px 24px; }
+    .stat-number {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 52px; font-weight: 800;
+      color: #6EE7B7;
+      letter-spacing: -2px; line-height: 1;
+    }
+    .stat-label { color: rgba(255,255,255,0.45); font-size: 13px; margin-top: 10px; letter-spacing: 0.5px; }
+
+    /* ── Sections ── */
+    .section { padding: 100px 60px; }
+    .section-tag {
+      font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+      color: #34D399; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-tag::before { content: ''; width: 24px; height: 2px; background: #059669; flex-shrink: 0; }
+    .section-h2 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(36px, 4vw, 56px);
+      font-weight: 800; letter-spacing: -1.5px; line-height: 1.1;
+    }
+    .section-h2.light { color: white; }
+    .section-h2.dark { color: #0A0A14; }
+    .section-body { font-size: 17px; line-height: 1.75; }
+    .section-body.light { color: rgba(255,255,255,0.65); }
+    .section-body.dark { color: #4B5563; }
+
+    /* ── Mission Split ── */
+    .split-img {
+      width: 100%; height: 100%; min-height: 480px;
+      object-fit: cover; border-radius: 24px;
+    }
+    .img-overlay-card {
+      position: absolute; bottom: 24px; left: 24px; right: 24px;
+      background: rgba(10,10,20,0.85); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px; padding: 20px 24px;
+    }
+
+    /* ── Cards articles ── */
+    .article-card {
+      background: white; border-radius: 20px;
+      overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      transition: all .3s; cursor: pointer;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .article-card:hover { transform: translateY(-6px); box-shadow: 0 24px 48px rgba(0,0,0,0.12); }
+    .article-card-img {
+      width: 100%; height: 220px;
+      object-fit: cover; display: block;
+    }
+    .article-card-img-placeholder {
+      width: 100%; height: 220px;
+      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%);
+      display: flex; align-items: center; justify-content: center; font-size: 48px;
+    }
+    .article-card-body { padding: 24px; }
+    .article-card-cat {
+      font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 10px;
+    }
+    .article-card-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 18px; font-weight: 700;
+      color: #111827; line-height: 1.35; margin-bottom: 10px;
+    }
+    .article-card-excerpt { font-size: 14px; color: #6B7280; line-height: 1.6; margin-bottom: 18px; }
+    .article-card-meta { display: flex; align-items: center; justify-content: space-between; }
+    .article-card-date { font-size: 12px; color: #9CA3AF; }
+    .article-card-link {
+      font-size: 13px; font-weight: 700; color: var(--accent);
+      display: flex; align-items: center; gap: 4px;
+      background: none; border: none; cursor: pointer; padding: 0;
+    }
+    .article-card-link:hover { gap: 8px; }
+
+    /* ── Full-width CTA ── */
+    .full-cta {
+      position: relative; overflow: hidden;
+      min-height: 560px; display: flex; align-items: center;
+    }
+    .full-cta-bg {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+    }
+    .full-cta-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(4,120,87,0.88) 0%, rgba(6,78,59,0.92) 100%);
+    }
+    .full-cta-content { position: relative; z-index: 2; padding: 80px 60px; max-width: 680px; }
+
+    /* ── Resources ── */
+    .resource-row {
+      display: flex; align-items: center; gap: 20px;
+      padding: 24px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: all .2s; cursor: pointer;
+    }
+    .resource-row:hover { padding-left: 12px; }
+    .resource-icon {
+      width: 48px; height: 48px; flex-shrink: 0;
+      background: rgba(5,150,105,0.15); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    .resource-title { font-size: 16px; font-weight: 600; color: white; }
+    .resource-desc { font-size: 13px; color: rgba(255,255,255,0.45); margin-top: 3px; }
+    .resource-tag {
+      margin-left: auto; flex-shrink: 0;
+      font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+      background: rgba(5,150,105,0.2); color: var(--accent-light);
+      padding: 4px 12px; border-radius: 100px;
+    }
+
+    /* ── Contact ── */
+    .contact-input {
+      width: 100%; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white; font-size: 15px;
+      padding: 16px 20px; border-radius: 14px;
+      outline: none; transition: all .2s;
+    }
+    .contact-input::placeholder { color: rgba(255,255,255,0.3); }
+    .contact-input:focus { border-color: var(--accent); background: rgba(5,150,105,0.08); }
+    .contact-label { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 8px; display: block; letter-spacing: 0.3px; }
+
+    /* ── About page ── */
+    .about-hero {
+      position: relative; height: 55vh; min-height: 400px;
+      display: flex; align-items: flex-end; overflow: hidden;
+    }
+    .about-hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+    .about-hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,10,20,0.9) 0%, rgba(10,10,20,0.3) 100%); }
+    .about-hero-content { position: relative; z-index: 2; padding: 0 60px 60px; }
+
+    /* ── Page inner header ── */
+    .page-header {
+      background: var(--dark); padding: 140px 60px 60px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .page-header-h1 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(44px, 5vw, 64px); font-weight: 800;
+      color: white; letter-spacing: -2px; line-height: 1.1;
+    }
+    .page-header-sub { font-size: 18px; color: rgba(255,255,255,0.5); margin-top: 12px; }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--dark);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 60px 60px 40px;
+    }
+    .footer-brand .logo-mark { width: 36px; height: 36px; font-size: 12px; }
+    .footer-link {
+      color: rgba(255,255,255,0.4); font-size: 14px; cursor: pointer;
+      transition: color .2s; background: none; border: none;
+      text-align: left; padding: 0; display: block; line-height: 1;
+      font-family: 'Inter', sans-serif;
+    }
+    .footer-link:hover { color: white; }
+    .footer-divider { border-color: rgba(255,255,255,0.06); margin: 40px 0 24px; }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      background: var(--accent); color: white;
+      font-weight: 700; font-size: 15px;
+      padding: 16px 32px; border-radius: 100px;
+      cursor: pointer; border: none; transition: all .25s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover { background: #047857; transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.25);
+      color: white; font-weight: 600; font-size: 15px;
+      padding: 15px 32px; border-radius: 100px;
+      cursor: pointer; transition: all .25s;
+    }
+    .btn-outline:hover { border-color: white; background: rgba(255,255,255,0.05); }
+
+    /* ── Actualités page ── */
+    .filter-pill {
+      padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all .2s; border: 1.5px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.5); background: transparent;
+    }
+    .filter-pill.active, .filter-pill:hover {
+      background: var(--accent); color: white; border-color: var(--accent);
+    }
+
+    /* ── Article full page ── */
+    .prose-content p { margin-bottom: 20px; font-size: 17px; line-height: 1.8; color: #374151; }
+    .prose-content h2 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 26px; font-weight: 800; color: #111827; margin: 36px 0 16px; }
+    .prose-content h3 { font-size: 20px; font-weight: 700; color: #111827; margin: 28px 0 12px; }
+    .prose-content ul { margin: 0 0 20px 24px; }
+    .prose-content li { font-size: 16px; line-height: 1.7; color: #374151; margin-bottom: 8px; }
+
+    /* ── Util ── */
+    .badge {
+      display: inline-flex; align-items: center;
+      font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      padding: 4px 12px; border-radius: 100px;
+    }
+    .badge-published { background: #D1FAE5; color: #065F46; }
+    .badge-draft { background: #FEF3C7; color: #92400E; }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      #main-nav { padding: 16px 20px; }
+      #main-nav.scrolled { padding: 12px 20px; }
+      .nav-links { display: none; }
+      .hero-content { padding: 0 24px 60px; }
+      .hero-h1 { font-size: 44px; }
+      .section { padding: 60px 24px; }
+      .hero-scroll { right: 24px; }
+      .page-header { padding: 120px 24px 40px; }
+      footer { padding: 40px 24px 32px; }
+      .full-cta-content { padding: 60px 24px; }
+      .about-hero-content { padding: 0 24px 40px; }
+      .cta-stepup { display: none; }
+    }
+  </style>
+</head>
+<body style="background: #0A0F0D; overflow-x: hidden;">
+
+<!-- ══════════════════════════════════════════ NAV ══ -->
+<nav id="main-nav">
+  <div onclick="showPage('accueil')" style="cursor:pointer;display:flex;align-items:center">
+    <img src="/logo.svg" alt="MiRiDom — Minority Rights Dominica"
+      style="height:40px;width:auto;filter:brightness(0) invert(1)"
+      onerror="this.outerHTML='<div style=\'display:flex;align-items:center;gap:10px;cursor:pointer\' onclick=\'showPage(\'accueil\')\'>'+
+        '<div style=\'width:36px;height:36px;background:linear-gradient(135deg,#059669,#047857);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;color:white;font-size:12px\'>MD</div>'+
+        '<div><div style=\'font-weight:800;font-size:16px;color:white\'>MiRiDom</div><div style=\'font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:0.5px\'>Minority Rights Dominica</div></div></div>'" />
+  </div>
+  <div class="nav-links" id="nav-links">
+    <button class="nav-link active" data-page="accueil" onclick="showPage('accueil')">Home</button>
+    <button class="nav-link" data-page="apropos" onclick="showPage('apropos')">About</button>
+    <button class="nav-link" data-page="actualites" onclick="showPage('actualites')">News</button>
+    <button class="nav-link" data-page="ressources" onclick="showPage('ressources')">Resources</button>
+    <button class="nav-link" data-page="droits" onclick="showPage('droits')">Rights</button>
+    <button class="nav-link" data-page="contact" onclick="showPage('contact')">Contact</button>
+  </div>
+  <button class="btn-nav-cta" onclick="showPage('contact')">Contact us</button>
+</nav>
+
+<!-- ══════════════════════════════════════════ PAGE : ACCUEIL ══ -->
+<div id="page-accueil" class="page active">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-bg" id="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1748810859309-b943147cdda2?q=85&w=1920&auto=format&fit=crop')"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-tag">Human rights advocacy organization</div>
+      <h1 class="hero-h1" id="hero-title">Defending the rights<br>of <span class="highlight">everyone</span> in<br>Dominica</h1>
+      <p class="hero-sub" id="hero-sub">MiRiDom advocates for the fundamental rights of the LGBTQ+ community in Dominica. Together, let's build a more just and inclusive society.</p>
+      <div class="hero-ctas">
+        <button class="btn-primary-hero" onclick="showPage('apropos')">
+          Discover our mission
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </button>
+        <button class="btn-secondary-hero" onclick="showPage('ressources')">Our resources</button>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="hero-scroll-line"></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-strip">
+    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);">
+      <div class="stat-item" style="border-right:1px solid rgba(255,255,255,0.06)">
+        <div class="stat-number">2020</div>
+        <div class="stat-label">Year founded</div>
+      </div>
+      <div class="stat-item" style="border-right:1px solid rgba(255,255,255,0.06)">
+        <div class="stat-number">500+</div>
+        <div class="stat-label">Active members</div>
+      </div>
+      <div class="stat-item" style="border-right:1px solid rgba(255,255,255,0.06)">
+        <div class="stat-number">12</div>
+        <div class="stat-label">Campaigns led</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">100%</div>
+        <div class="stat-label">Community commitment</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISSION SPLIT -->
+  <section style="background:#F9FAFB; padding:100px 60px;">
+    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;">
+      <div>
+        <div class="section-tag">Our mission</div>
+        <h2 class="section-h2 dark" style="margin-bottom:24px" id="home-mission-title">Promoting human dignity for all</h2>
+        <p class="section-body dark" style="margin-bottom:32px" id="home-mission-text">MiRiDom is a civil society organization founded to defend the human rights of all people in Dominica, with a particular focus on the LGBTQ+ community. We document, raise awareness, and act for lasting change.</p>
+        <div style="display:flex;flex-direction:column;gap:20px;margin-bottom:40px">
+          <div style="display:flex;align-items:flex-start;gap:16px">
+            <div style="width:3px;height:48px;flex-shrink:0;background:#059669;border-radius:4px;margin-top:2px"></div>
+            <div>
+              <div style="font-weight:700;font-size:15px;color:#111827;margin-bottom:4px">Legal advocacy</div>
+              <div style="font-size:14px;color:#6B7280;line-height:1.6">Supporting victims of discrimination and access to justice.</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:16px">
+            <div style="width:3px;height:48px;flex-shrink:0;background:#059669;border-radius:4px;margin-top:2px"></div>
+            <div>
+              <div style="font-weight:700;font-size:15px;color:#111827;margin-bottom:4px">Community support</div>
+              <div style="font-size:14px;color:#6B7280;line-height:1.6">Safe spaces, support groups, and a mutual aid network.</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:16px">
+            <div style="width:3px;height:48px;flex-shrink:0;background:#059669;border-radius:4px;margin-top:2px"></div>
+            <div>
+              <div style="font-weight:700;font-size:15px;color:#111827;margin-bottom:4px">Public awareness</div>
+              <div style="font-size:14px;color:#6B7280;line-height:1.6">Information campaigns and dialogue with institutions.</div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="showPage('apropos')">Learn more</button>
+      </div>
+      <div style="position:relative">
+        <img src="https://images.unsplash.com/photo-1575221165108-1c5d11ee1c51?q=80&w=900&auto=format&fit=crop"
+          alt="Waterfall in Dominica" class="split-img"
+          style="box-shadow:0 32px 64px rgba(0,0,0,0.15)" />
+        <div class="img-overlay-card">
+          <div style="font-size:11px;font-weight:700;color:#34D399;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px">The Nature Island</div>
+          <div style="font-size:15px;font-weight:600;color:white">Dominica, the Nature Island of the Caribbean</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:4px">An exceptional island to protect and celebrate</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACTUALITÉS HOME -->
+  <section style="background:white;padding:100px 60px;">
+    <div style="max-width:1100px;margin:0 auto">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:56px">
+        <div>
+          <div class="section-tag">Recent publications</div>
+          <h2 class="section-h2 dark">Latest news</h2>
+        </div>
+        <button onclick="showPage('actualites')" style="background:none;border:none;font-size:14px;font-weight:700;color:#059669;cursor:pointer;display:flex;align-items:center;gap:6px">
+          All news
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </button>
+      </div>
+      <div id="home-articles-list" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+        <div style="color:#9CA3AF;text-align:center;padding:60px;grid-column:1/-1">Loading articles…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- IN THE MEDIA -->
+  <section style="background:#F9FAFB;padding:100px 60px">
+    <div style="max-width:1100px;margin:0 auto">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:56px">
+        <div>
+          <div class="section-tag">Press &amp; Media</div>
+          <h2 class="section-h2 dark">In the Media</h2>
+        </div>
+      </div>
+      <div style="position:relative;border-radius:20px;overflow:hidden;margin-bottom:44px;box-shadow:0 20px 44px rgba(0,0,0,0.12)">
+        <img src="/media-collage.png" alt="MiRiDom in the press — newspaper clippings and articles" style="width:100%;height:auto;display:block" />
+        <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(4,120,87,0.88) 0%,rgba(6,78,59,0.92) 100%)"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px" id="media-grid">
+        <!-- Card 1 -->
+        <article class="article-card">
+          <img src="https://images.unsplash.com/photo-1573339584805-6ed85958b6e8?q=80&w=600&auto=format&fit=crop" alt="Pride" class="article-card-img" />
+          <div class="article-card-body">
+            <div class="article-card-cat">Interview</div>
+            <div class="article-card-title">DOMINICA: 'It's an ongoing journey to achieve full inclusion and acceptance of LGBTQI+ people'</div>
+            <div class="article-card-meta" style="margin-top:16px"><span class="article-card-date">OutRight Action International</span><a href="#" target="_blank" class="article-card-link">Read →</a></div>
+          </div>
+        </article>
+        <!-- Card 2 -->
+        <article class="article-card">
+          <img src="https://images.unsplash.com/photo-1596247851352-5b908d61c6fc?q=80&w=600&auto=format&fit=crop" alt="Court ruling" class="article-card-img" />
+          <div class="article-card-body">
+            <div class="article-card-cat">Press release</div>
+            <div class="article-card-title">MiRiDom celebrates and welcomes court ruling</div>
+            <div class="article-card-meta" style="margin-top:16px"><span class="article-card-date">MiRiDom</span><a href="#" target="_blank" class="article-card-link">Read →</a></div>
+          </div>
+        </article>
+        <!-- Card 3 -->
+        <article class="article-card">
+          <img src="https://images.unsplash.com/photo-1748810859309-b943147cdda2?q=80&w=600&auto=format&fit=crop" alt="Caribbean progress" class="article-card-img" />
+          <div class="article-card-body">
+            <div class="article-card-cat">Regional news</div>
+            <div class="article-card-title">Progress in the Caribbean as Dominica Decriminalizes Same-Sex Relations</div>
+            <div class="article-card-meta" style="margin-top:16px"><span class="article-card-date">ILGA World</span><a href="#" target="_blank" class="article-card-link">Read →</a></div>
+          </div>
+        </article>
+        <!-- Card 4 -->
+        <article class="article-card">
+          <img src="https://images.unsplash.com/photo-1575221165108-1c5d11ee1c51?q=80&w=600&auto=format&fit=crop" alt="Policy" class="article-card-img" />
+          <div class="article-card-body">
+            <div class="article-card-cat">Recommendations</div>
+            <div class="article-card-title">MiRiDom has released its recommendations to the Government of Dominica requesting Policy Change for equal rights for the LGBTQI Community and Electoral Reform</div>
+            <div class="article-card-meta" style="margin-top:16px"><span class="article-card-date">MiRiDom</span><a href="#" target="_blank" class="article-card-link">Read →</a></div>
+          </div>
+        </article>
+        <!-- Card 5 -->
+        <article class="article-card">
+          <img src="https://images.unsplash.com/photo-1550338649-0131b8cec2d7?q=80&w=600&auto=format&fit=crop" alt="High Court" class="article-card-img" />
+          <div class="article-card-body">
+            <div class="article-card-cat">Legal victory</div>
+            <div class="article-card-title">MiRiDom Welcomes High Court Ruling Declaring Buggery Laws in Dominica Unconstitutional</div>
+            <div class="article-card-meta" style="margin-top:16px"><span class="article-card-date">MiRiDom</span><a href="#" target="_blank" class="article-card-link">Read →</a></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIDE CTA -->
+  <div class="full-cta">
+    <div class="full-cta-bg" style="background-image:url('https://images.unsplash.com/photo-1573339584805-6ed85958b6e8?q=80&w=1920&auto=format&fit=crop')"></div>
+    <div class="full-cta-overlay"></div>
+    <div class="full-cta-content">
+      <div class="hero-tag" style="margin-bottom:24px">Pride & Solidarity</div>
+      <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(40px,5vw,64px);font-weight:800;color:white;letter-spacing:-2px;line-height:1.05;margin-bottom:20px">
+        Everyone deserves<br>to live freely
+      </h2>
+      <p style="font-size:17px;color:rgba(255,255,255,0.65);line-height:1.7;margin-bottom:36px;max-width:480px">
+        Join MiRiDom and be an agent of change in Dominica. Your voice matters.
+      </p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn-primary-hero" onclick="showPage('contact')">Join us</button>
+        <button class="btn-secondary-hero" onclick="showPage('apropos')">Our story</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMMUNITY SECTION -->
+  <section style="background:#F9FAFB;padding:100px 60px">
+    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center">
+      <div style="position:relative">
+        <img src="/step-up.png" alt="Step Up! So others don't get stepped on — MiRiDom campaign"
+          style="width:100%;height:auto;border-radius:24px;display:block;box-shadow:0 32px 64px rgba(0,0,0,0.12)" />
+      </div>
+      <div>
+        <div class="section-tag">Community</div>
+        <h2 class="section-h2 dark" style="margin-bottom:24px">Stronger together</h2>
+        <p class="section-body dark" style="margin-bottom:40px">
+          MiRiDom brings together people from all walks of life around a common goal: building a Dominica where every individual can live with dignity, free from discrimination and violence.
+        </p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px">
+          <div style="background:white;border-radius:16px;padding:24px;box-shadow:0 4px 16px rgba(0,0,0,0.06)">
+            <div style="font-size:32px;font-weight:800;color:#059669;font-family:'Plus Jakarta Sans',sans-serif">150+</div>
+            <div style="font-size:14px;color:#6B7280;margin-top:4px">Documented cases</div>
+          </div>
+          <div style="background:white;border-radius:16px;padding:24px;box-shadow:0 4px 16px rgba(0,0,0,0.06)">
+            <div style="font-size:32px;font-weight:800;color:#059669;font-family:'Plus Jakarta Sans',sans-serif">8</div>
+            <div style="font-size:14px;color:#6B7280;margin-top:4px">Regional partners</div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="showPage('contact')">Join MiRiDom</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FESTIVAL / CULTURE -->
+  <section style="background:var(--dark-2);padding:100px 60px">
+    <div style="max-width:1100px;margin:0 auto">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:56px">
+        <div>
+          <div class="section-tag">Culture & Identity</div>
+          <h2 class="section-h2 light" style="max-width:500px">Caribbean pride, in all its diversity</h2>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr;grid-template-rows:220px 220px;gap:12px;border-radius:24px;overflow:hidden;height:452px">
+        <!-- Grande image gauche sur toute la hauteur -->
+        <img src="https://images.unsplash.com/photo-1767801829414-2a0a9160a3a8?q=80&w=1200&auto=format&fit=crop"
+          alt="Caribbean street festival"
+          style="width:100%;height:100%;object-fit:cover;display:block;grid-row:1/3" />
+        <!-- Petite image forêt en haut à droite -->
+        <img src="https://images.unsplash.com/photo-1550338649-0131b8cec2d7?q=80&w=600&auto=format&fit=crop"
+          alt="Dominica tropical rainforest"
+          style="width:100%;height:100%;object-fit:cover;display:block" />
+        <!-- Bloc Pride en bas à droite -->
+        <div style="background:linear-gradient(135deg,#059669,#047857);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:28px;text-align:center">
+          <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:2px;text-transform:uppercase">Dominica</div>
+          <div style="font-size:20px;font-weight:800;color:white;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.15">Pride &<br>Solidarity</div>
+          <div style="width:32px;height:2px;background:rgba(255,255,255,0.4);border-radius:2px;margin-top:4px"></div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.6);letter-spacing:1.5px;text-transform:uppercase">Visibility · Dignity</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ══════════════════════════════════════════ PAGE : À PROPOS ══ -->
+<div id="page-apropos" class="page">
+  <div class="about-hero">
+    <div class="about-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1575221165108-1c5d11ee1c51?q=80&w=1920&auto=format&fit=crop')"></div>
+    <div class="about-hero-overlay"></div>
+    <div class="about-hero-content">
+      <div class="hero-tag">About MiRiDom</div>
+      <h1 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(44px,5vw,68px);font-weight:800;color:white;letter-spacing:-2px;line-height:1.05">Our story,<br>our fight</h1>
+    </div>
+  </div>
+
+  <section style="background:white;padding:80px 60px">
+    <div style="max-width:800px;margin:0 auto">
+      <p style="font-size:20px;line-height:1.8;color:#374151;margin-bottom:28px;font-weight:500" id="about-content-main">
+        MiRiDom (Minority Rights Dominica) is a civil society organization founded to defend the human rights of all people in Dominica, with a particular focus on the LGBTQ+ community.
+      </p>
+      <p style="font-size:17px;line-height:1.8;color:#6B7280;margin-bottom:40px">
+        We believe that everyone deserves to live freely and with dignity, regardless of their sexual orientation or gender identity. Our work centers on documentation, awareness, and advocacy.
+      </p>
+    </div>
+  </section>
+
+  <section style="background:#F9FAFB;padding:80px 60px">
+    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px">
+      <div style="background:white;border-radius:24px;padding:40px;box-shadow:0 4px 24px rgba(0,0,0,0.06);border-top:3px solid #059669">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#059669;margin-bottom:16px">Our mission</div>
+        <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:#111827;margin-bottom:16px">Mission</h3>
+        <p style="font-size:15px;color:#6B7280;line-height:1.75" id="about-mission">To promote, protect, and defend the fundamental rights of all people in Dominica, regardless of their sexual orientation or gender identity.</p>
+      </div>
+      <div style="background:white;border-radius:24px;padding:40px;box-shadow:0 4px 24px rgba(0,0,0,0.06);border-top:3px solid #34D399">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#059669;margin-bottom:16px">Our vision</div>
+        <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:#111827;margin-bottom:16px">Vision</h3>
+        <p style="font-size:15px;color:#6B7280;line-height:1.75" id="about-vision">A Dominica where everyone lives freely, with dignity, and in safety, regardless of their sexual orientation and gender identity.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="full-cta" style="min-height:400px">
+    <div class="full-cta-bg" style="background-image:url('https://images.unsplash.com/photo-1596247851352-5b908d61c6fc?q=80&w=1920&auto=format&fit=crop')"></div>
+    <div class="full-cta-overlay" style="background:linear-gradient(135deg,rgba(4,120,87,0.88),rgba(6,78,59,0.92))"></div>
+    <div class="full-cta-content">
+      <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:48px;font-weight:800;color:white;letter-spacing:-1.5px;margin-bottom:16px">Join the movement</h2>
+      <p style="font-size:17px;color:rgba(255,255,255,0.75);margin-bottom:32px;max-width:440px">Together we are stronger. Get in touch to get involved.</p>
+      <button class="btn-primary-hero" onclick="showPage('contact')">Get in touch</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ PAGE : ACTUALITÉS ══ -->
+<div id="page-actualites" class="page">
+  <div class="page-header">
+    <div style="max-width:700px">
+      <div class="section-tag">Publications</div>
+      <h1 class="page-header-h1">News</h1>
+      <p class="page-header-sub">Articles, press releases, and news from MiRiDom.</p>
+    </div>
+  </div>
+  <section style="background:white;padding:60px">
+    <div style="max-width:1100px;margin:0 auto">
+      <div id="actualites-list" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+        <div style="color:#9CA3AF;text-align:center;padding:60px;grid-column:1/-1">Loading articles…</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════════ PAGE : ARTICLE DYNAMIQUE ══ -->
+<div id="page-article-dynamic" class="page">
+  <div id="article-dynamic-content" style="min-height:60vh"></div>
+</div>
+
+<!-- ══════════════════════════════════════════ PAGE : RESSOURCES ══ -->
+<div id="page-ressources" class="page">
+  <div class="page-header">
+    <div class="section-tag">Resources</div>
+    <h1 class="page-header-h1">Resources</h1>
+    <p class="page-header-sub">Downloadable documents and useful links for the community.</p>
+  </div>
+
+  <section style="background:var(--dark-2);padding:60px">
+    <div style="max-width:860px;margin:0 auto">
+      <div id="ressources-dynamic-list">
+        <div style="color:rgba(255,255,255,0.3);text-align:center;padding:60px">Loading…</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════════ PAGE : CONTACT ══ -->
+<div id="page-contact" class="page">
+  <div style="min-height:100vh;background:var(--dark);display:flex;flex-direction:column">
+    <div style="flex:1;padding:140px 60px 60px">
+      <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start">
+        <!-- Info side -->
+        <div>
+          <div class="section-tag">Contact</div>
+          <h1 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(44px,4.5vw,60px);font-weight:800;color:white;letter-spacing:-2px;line-height:1.1;margin-bottom:24px">Let's talk</h1>
+          <p style="font-size:17px;color:rgba(255,255,255,0.55);line-height:1.75;margin-bottom:48px">Have a question, a story to share, or want to join the movement? Our team will get back to you.</p>
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <div style="display:flex;align-items:center;gap:16px">
+              <div style="width:48px;height:48px;background:rgba(5,150,105,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="22" height="22" fill="none" stroke="#34D399" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              </div>
+              <div>
+                <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;font-weight:600;color:rgba(255,255,255,0.4);margin-bottom:3px">Email</div>
+                <div style="font-size:16px;color:white;font-weight:500">contact@miridom.org</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:16px">
+              <div style="width:48px;height:48px;background:rgba(5,150,105,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="22" height="22" fill="none" stroke="#34D399" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              </div>
+              <div>
+                <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;font-weight:600;color:rgba(255,255,255,0.4);margin-bottom:3px">Confidentiality</div>
+                <div style="font-size:15px;color:rgba(255,255,255,0.65)">All your communications are handled with discretion.</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:56px">
+            <img src="https://images.unsplash.com/photo-1748810859309-b943147cdda2?q=80&w=600&auto=format&fit=crop"
+              alt="Dominica" style="width:100%;border-radius:20px;height:220px;object-fit:cover;opacity:0.6" />
+          </div>
+        </div>
+        <!-- Form side -->
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:28px;padding:44px">
+          <form onsubmit="handleForm(event)">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+              <div>
+                <label class="contact-label" for="c-name">Your name *</label>
+                <input id="c-name" name="name" required class="contact-input" placeholder="Jane Doe" />
+              </div>
+              <div>
+                <label class="contact-label" for="c-email">Email *</label>
+                <input id="c-email" name="email" type="email" required class="contact-input" placeholder="jane@example.com" />
+              </div>
+            </div>
+            <div style="margin-bottom:16px">
+              <label class="contact-label" for="c-subject">Subject</label>
+              <input id="c-subject" name="subject" class="contact-input" placeholder="Subject of your message" />
+            </div>
+            <div style="margin-bottom:28px">
+              <label class="contact-label" for="c-message">Message *</label>
+              <textarea id="c-message" name="message" required rows="5" class="contact-input" style="resize:none" placeholder="Your message…"></textarea>
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%;justify-content:center;padding:18px">
+              Send message
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </button>
+            <div id="form-success" style="display:none;margin-top:20px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);border-radius:14px;padding:16px;color:#6EE7B7;font-size:14px;text-align:center">
+              ✓ Message sent! We'll get back to you as soon as possible.
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ PAGE : DROITS ══ -->
+<div id="page-droits" class="page">
+  <div style="position:relative;height:50vh;min-height:380px;overflow:hidden;display:flex;align-items:flex-end">
+    <div style="position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1596247851352-5b908d61c6fc?q=80&w=1920&auto=format&fit=crop');background-size:cover;background-position:center"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(10,15,13,0.92) 0%,rgba(10,15,13,0.3) 100%)"></div>
+    <div style="position:relative;z-index:2;padding:0 60px 60px">
+      <div class="hero-tag">Rights education</div>
+      <h1 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(40px,5vw,64px);font-weight:800;color:white;letter-spacing:-2px;line-height:1.05">Human rights<br>in Dominica</h1>
+    </div>
+  </div>
+
+  <!-- Human Rights in Dominica -->
+  <section style="background:white;padding:80px 60px">
+    <div style="max-width:860px;margin:0 auto">
+      <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#059669;margin-bottom:12px">Human Rights in Dominica</div>
+      <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:36px;font-weight:800;color:#111827;margin-bottom:32px;letter-spacing:-1px">Universal human rights</h2>
+      <div style="font-size:17px;line-height:1.85;color:#374151;space-y:20px">
+        <p style="margin-bottom:20px">Human rights are universal. Every person is equally entitled to benefit from these rights, regardless of their race, religion, language, nationality, sex, gender, sexual orientation, disability, ethnic origin, or any other status. Every person is born with human rights. We have these rights simply by virtue of being human beings — they are not granted by the state.</p>
+        <p style="margin-bottom:20px">All people have human rights and all people are equal. Equality goes hand in hand with the principle of non-discrimination. Discrimination means to treat people differently from others, in an unfair manner, based on certain protected personal characteristics. This can include a person's race, religion, gender, age, or sexual orientation, among other things.</p>
+        <p style="margin-bottom:24px">States have obligations under international law to respect, protect, and fulfill the human rights of their citizens. This means:</p>
+        <ul style="margin:0 0 28px 0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:12px">
+          <li style="display:flex;gap:12px;align-items:flex-start"><span style="width:8px;height:8px;border-radius:50%;background:#059669;flex-shrink:0;margin-top:8px"></span><span>The state must not violate or interfere with a person's human rights.</span></li>
+          <li style="display:flex;gap:12px;align-items:flex-start"><span style="width:8px;height:8px;border-radius:50%;background:#059669;flex-shrink:0;margin-top:8px"></span><span>The state must protect individuals from having their human rights abused by others.</span></li>
+          <li style="display:flex;gap:12px;align-items:flex-start"><span style="width:8px;height:8px;border-radius:50%;background:#059669;flex-shrink:0;margin-top:8px"></span><span>The state must take positive actions to help individuals enjoy their basic human rights.</span></li>
+        </ul>
+        <p style="margin-bottom:20px">In Dominica, human rights are found in the Constitution. The Constitution is the core legal document that sets out the fundamental principles and ideals of the Dominican state. How constitutional principles are interpreted and applied can change over time as the attitudes and beliefs of Dominican society evolve.</p>
+        <p style="margin-bottom:24px">The Constitution of Dominica protects many human rights, including:</p>
+        <ul style="margin:0 0 28px 0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:12px">
+          <li style="display:flex;gap:12px;align-items:flex-start"><span style="width:8px;height:8px;border-radius:50%;background:#059669;flex-shrink:0;margin-top:8px"></span><span>The right to life (section 2);</span></li>
+          <li style="display:flex;gap:12px;align-items:flex-start"><span style="width:8px;height:8px;border-radius:50%;background:#059669;flex-shrink:0;margin-top:8px"></span><span>The right to personal liberty (section 3);</span></li>
+          <li style="display:flex;gap:12px;align-items:flex-start"><span style="width:8px;height:8px;border-radius:50%;background:#059669;flex-shrink:0;margin-top:8px"></span><span>Protection from inhuman treatment (section 5);</span></li>
+          <li style="display:flex;gap:12px;align-items:flex-start"><span style="width:8px;height:8px;border-radius:50%;background:#059669;flex-shrink:0;margin-top:8px"></span><span>Protection from arbitrary search or entry (section 7).</span></li>
+        </ul>
+        <p style="margin-bottom:20px">In democracies like Dominica, courts and judges have an important role to play in interpreting laws and in making sure that laws do not violate the Constitution. The Constitution is the supreme law of the country. If a law goes against the Constitution, judges can decide that the law must be changed or overturned.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LGBTQ+ Rights -->
+  <section style="background:#F0FDF4;padding:80px 60px">
+    <div style="max-width:860px;margin:0 auto">
+      <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#059669;margin-bottom:12px">LGBTQ+ Rights in Dominica</div>
+      <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:36px;font-weight:800;color:#111827;margin-bottom:32px;letter-spacing:-1px">The Current Status of LGBTQ+ Rights in Dominica</h2>
+      <div style="background:white;border-left:4px solid #059669;border-radius:0 16px 16px 0;padding:28px 32px;margin-bottom:32px;box-shadow:0 4px 20px rgba(5,150,105,0.08)">
+        <p style="font-size:17px;line-height:1.85;color:#374151">As a result of a legal judgement in <strong>April 2024</strong>, people in Dominica over the age of 16 no longer face the risk of being arrested, prosecuted, or convicted for having consensual same-sex sexual relations in private.</p>
+      </div>
+      <div style="font-size:16px;line-height:1.85;color:#4B5563">
+        <p style="margin-bottom:20px">The legal challenge did not have anything to do with same-sex unions or marriages. Same-sex unions and marriages are not legal in Dominica at this time.</p>
+        <div style="background:white;border-radius:16px;padding:24px;border:1px solid #D1FAE5;display:flex;align-items:flex-start;gap:16px;margin-top:24px">
+          <svg width="24" height="24" fill="none" stroke="#059669" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:2px"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <p style="color:#374151;font-size:15px;line-height:1.7">Please read our <button onclick="showPage('actualites')" style="background:none;border:none;color:#059669;font-weight:600;cursor:pointer;text-decoration:underline;padding:0">statement from the time of the court decision</button> in our News section.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="background:white;padding:60px;text-align:center">
+    <button onclick="showPage('contact')" class="btn-primary">Contact us</button>
+    <button onclick="showPage('ressources')" class="btn-outline" style="margin-left:12px;color:#374151;border-color:#E5E7EB">See our resources</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ FOOTER ══ -->
+<footer>
+  <div style="max-width:1100px;margin:0 auto">
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px">
+      <div>
+        <div style="margin-bottom:16px">
+          <img src="/logo.svg" alt="MiRiDom" style="height:36px;width:auto;filter:brightness(0) invert(0.7)"
+            onerror="this.outerHTML='<div style=\'font-weight:800;font-size:16px;color:white\'>MiRiDom</div>'" />
+        </div>
+        <p style="font-size:14px;color:rgba(255,255,255,0.35);line-height:1.7;max-width:280px">Human rights advocacy organization for the LGBTQ+ community in Dominica.</p>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:16px">Navigation</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="footer-link" onclick="showPage('accueil')">Home</button>
+          <button class="footer-link" onclick="showPage('apropos')">About</button>
+          <button class="footer-link" onclick="showPage('actualites')">News</button>
+          <button class="footer-link" onclick="showPage('ressources')">Resources</button>
+          <button class="footer-link" onclick="showPage('droits')">Rights</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:16px">Help</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="footer-link" onclick="showPage('contact')">Contact</button>
+          <button class="footer-link" style="cursor:default;font-size:14px">Privacy</button>
+          <a href="admin.html" class="footer-link" style="text-decoration:none;font-size:14px">Admin</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:16px">Contact</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.8">
+          <div>contact@miridom.org</div>
+          <div style="margin-top:8px">miridom.org</div>
+        </div>
+      </div>
+    </div>
+    <hr class="footer-divider" />
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <p style="font-size:13px;color:rgba(255,255,255,0.25)">© 2025 MiRiDom — Minority Rights Dominica. All rights reserved.</p>
+      <p style="font-size:13px;color:rgba(255,255,255,0.2)">Photos © Unsplash</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Config API ────────────────────────────────────────────────────
+const API = window.location.origin;
+
+async function callApi(path) {
+  try {
+    const r = await fetch(API + path);
+    if (!r.ok) return null;
+    return r.json();
+  } catch { return null; }
+}
+
+// ── Nav scroll behavior ───────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('main-nav');
+  if (window.scrollY > 60) nav.classList.add('scrolled');
+  else nav.classList.remove('scrolled');
+}, { passive: true });
+
+// ── Navigation ────────────────────────────────────────────────────
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('[data-page]').forEach(el => el.classList.remove('active'));
+
+  const page = document.getElementById('page-' + pageId);
+  if (page) { page.classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+  const navLink = document.querySelector(`[data-page="${pageId}"]`);
+  if (navLink) navLink.classList.add('active');
+
+  if (pageId === 'actualites') loadActualitesPage();
+  if (pageId === 'ressources') loadRessourcesPage();
+  if (pageId === 'apropos') loadAboutPage();
+}
+
+// ── Article card template ─────────────────────────────────────────
+const ARTICLE_IMGS = [
+  'https://images.unsplash.com/photo-1573339584805-6ed85958b6e8?q=80&w=600&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1596247851352-5b908d61c6fc?q=80&w=600&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1767801829414-2a0a9160a3a8?q=80&w=600&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1748810859309-b943147cdda2?q=80&w=600&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1575221165108-1c5d11ee1c51?q=80&w=600&auto=format&fit=crop',
+];
+
+function articleCardHTML(a, idx) {
+  const imgUrl = ARTICLE_IMGS[idx % ARTICLE_IMGS.length];
+  return `
+    <div class="article-card" onclick="showArticle('${a.id}')">
+      <img src="${imgUrl}" alt="${esc(a.title)}" class="article-card-img"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+      <div class="article-card-img-placeholder" style="display:none">📰</div>
+      <div class="article-card-body">
+        <div class="article-card-title">${esc(a.title)}</div>
+        <div class="article-card-excerpt">${esc((a.excerpt||'').substring(0,110))}…</div>
+        <div class="article-card-meta">
+          <span class="article-card-date">${a.date}</span>
+          <button class="article-card-link" onclick="event.stopPropagation();showArticle('${a.id}')">
+            Read <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── Home articles ─────────────────────────────────────────────────
+let _allArticles = [];
+let _articlesLoaded = false;
+
+async function loadHomeArticles() {
+  if (_articlesLoaded) { renderHomeArticles(); return; }
+  const arts = await callApi('/api/articles');
+  if (arts) { _allArticles = arts; _articlesLoaded = true; }
+  renderHomeArticles();
+}
+
+function renderHomeArticles() {
+  const el = document.getElementById('home-articles-list');
+  if (!el) return;
+  const list = _allArticles.slice(0, 3);
+  if (!list.length) {
+    el.innerHTML = '<div style="color:#9CA3AF;text-align:center;padding:60px;grid-column:1/-1">No articles published yet.</div>';
+    return;
+  }
+  el.innerHTML = list.map((a, i) => articleCardHTML(a, i)).join('');
+}
+
+// ── Actualités page ───────────────────────────────────────────────
+async function loadActualitesPage() {
+  if (!_articlesLoaded) {
+    const arts = await callApi('/api/articles');
+    if (arts) { _allArticles = arts; _articlesLoaded = true; }
+  }
+  renderActualites(_allArticles);
+}
+
+function renderActualites(list) {
+  const el = document.getElementById('actualites-list');
+  if (!el) return;
+  if (!list.length) {
+    el.innerHTML = '<div style="color:#9CA3AF;text-align:center;padding:80px;grid-column:1/-1">No articles yet.</div>';
+    return;
+  }
+  el.innerHTML = list.map((a, i) => articleCardHTML(a, i)).join('');
+}
+
+// ── Show single article ───────────────────────────────────────────
+async function showArticle(id) {
+  if (!_articlesLoaded) { await loadHomeArticles(); }
+  const a = _allArticles.find(a => a.id === id);
+  if (!a) return;
+
+  const imgUrl = ARTICLE_IMGS[_allArticles.indexOf(a) % ARTICLE_IMGS.length];
+  const el = document.getElementById('article-dynamic-content');
+  if (el) {
+    el.innerHTML = `
+      <div style="position:relative;height:50vh;min-height:380px;overflow:hidden">
+        <img src="${imgUrl}" alt="${esc(a.title)}" style="width:100%;height:100%;object-fit:cover;display:block" />
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,20,0.9) 0%,rgba(10,10,20,0.2) 100%)"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:40px 60px">
+          <h1 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(32px,4vw,52px);font-weight:800;color:white;letter-spacing:-1.5px;line-height:1.1">${esc(a.title)}</h1>
+          <div style="font-size:14px;color:rgba(255,255,255,0.5);margin-top:12px">By ${esc(a.author||'MiRiDom')} &nbsp;·&nbsp; ${a.date}</div>
+        </div>
+      </div>
+      <div style="background:white;padding:60px">
+        <div style="max-width:760px;margin:0 auto">
+          <button onclick="showPage('actualites')" style="background:none;border:none;font-size:14px;color:#6B7280;cursor:pointer;display:flex;align-items:center;gap:6px;margin-bottom:40px;font-weight:500">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"/></svg>
+            Back to news
+          </button>
+          <div class="prose-content">${a.content || '<p>' + esc(a.excerpt) + '</p>'}</div>
+          <div style="margin-top:48px;padding-top:32px;border-top:1px solid #F3F4F6;display:flex;gap:12px">
+            <button class="btn-primary" onclick="showPage('ressources')">Our resources →</button>
+            <button class="btn-outline" style="color:#374151;border-color:#E5E7EB" onclick="showPage('contact')">Contact us</button>
+          </div>
+        </div>
+      </div>`;
+  }
+  showPage('article-dynamic');
+}
+
+// ── Ressources (liens + documents fusionnés) ──────────────────────
+let _resources = [];
+let _resLoaded = false;
+let _resCurrentFilter = '';
+
+async function loadRessourcesPage() {
+  if (!_resLoaded) {
+    const res = await callApi('/api/resources');
+    if (res) { _resources = res; _resLoaded = true; }
+  }
+  renderRessources();
+}
+
+// ── Rendu Ressources — 2 sections, cartes entièrement cliquables ─────────────
+function renderRessources() {
+  const el = document.getElementById('ressources-dynamic-list');
+  if (!el) return;
+
+  const docs  = _resources.filter(r => r.filename); // fichiers téléchargeables
+  const liens = _resources.filter(r => !r.filename); // liens externes
+
+  if (!docs.length && !liens.length) {
+    el.innerHTML = '<div style="color:rgba(255,255,255,0.3);text-align:center;padding:80px 0">No resources available yet.</div>';
+    return;
+  }
+
+  let html = '';
+
+  // ── Documents téléchargeables ──────────────────────────
+  if (docs.length) {
+    html += `<div style="margin-bottom:52px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+        <svg width="18" height="18" fill="none" stroke="#34D399" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+        <span style="font-size:12px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#34D399">Downloadable documents</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${docs.map(r => {
+          const url = r.url || '';
+          return `<a ${url ? `href="${url}" download` : 'href="#"'}
+            style="display:flex;align-items:center;gap:16px;padding:20px 22px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:14px;text-decoration:none;cursor:${url?'pointer':'default'};transition:background .2s,border-color .2s"
+            onmouseover="if('${url}'){this.style.background='rgba(5,150,105,0.1)';this.style.borderColor='rgba(52,211,153,0.3)'}"
+            onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,0.07)'"
+            ${!url ? 'onclick="event.preventDefault()"' : ''}>
+            <div style="width:46px;height:46px;flex-shrink:0;background:rgba(5,150,105,0.15);border-radius:11px;display:flex;align-items:center;justify-content:center">
+              <svg width="20" height="20" fill="none" stroke="#34D399" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:15px;color:white;line-height:1.3">${esc(r.title)}</div>
+              ${r.description ? `<div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:3px">${esc(r.description)}</div>` : ''}
+              ${r.originalFilename ? `<div style="font-size:11px;color:rgba(255,255,255,0.22);margin-top:4px">${esc(r.originalFilename)}${r.fileSize ? ' · ' + fmtSize(r.fileSize) : ''}</div>` : ''}
+            </div>
+            <div style="flex-shrink:0;display:inline-flex;align-items:center;gap:6px;${url?'background:#059669':'background:rgba(255,255,255,0.08)'};color:white;font-size:12px;font-weight:700;padding:9px 18px;border-radius:10px;white-space:nowrap">
+              ${url
+                ? `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M5 20h14"/></svg> Download`
+                : `<span style="color:rgba(255,255,255,0.3)">Coming soon</span>`}
+            </div>
+          </a>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  // ── Liens utiles ───────────────────────────────────────
+  if (liens.length) {
+    if (docs.length) html += `<div style="border-top:1px solid rgba(255,255,255,0.06);margin-bottom:36px"></div>`;
+    html += `<div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+        <svg width="18" height="18" fill="none" stroke="#34D399" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        <span style="font-size:12px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#34D399">Useful links</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${liens.map(r => {
+          const url = r.url && r.url !== '#' ? r.url : '';
+          return `<a ${url ? `href="${url}" target="_blank" rel="noopener"` : 'href="#"'}
+            style="display:flex;align-items:center;gap:16px;padding:20px 22px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:14px;text-decoration:none;cursor:${url?'pointer':'default'};transition:background .2s,border-color .2s"
+            onmouseover="if('${url}'){this.style.background='rgba(5,150,105,0.1)';this.style.borderColor='rgba(52,211,153,0.3)'}"
+            onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,0.07)'"
+            ${!url ? 'onclick="event.preventDefault()"' : ''}>
+            <div style="width:46px;height:46px;flex-shrink:0;background:rgba(5,150,105,0.15);border-radius:11px;display:flex;align-items:center;justify-content:center">
+              <svg width="20" height="20" fill="none" stroke="#34D399" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:15px;color:white;line-height:1.3">${esc(r.title)}</div>
+              ${r.description ? `<div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:3px">${esc(r.description)}</div>` : ''}
+              ${url ? `<div style="font-size:11px;color:rgba(255,255,255,0.22);margin-top:4px">${url}</div>` : ''}
+            </div>
+            <div style="flex-shrink:0;display:inline-flex;align-items:center;gap:6px;${url?'background:#059669':'background:rgba(255,255,255,0.08)'};color:white;font-size:12px;font-weight:700;padding:9px 18px;border-radius:10px;white-space:nowrap">
+              ${url ? 'Open →' : '<span style="color:rgba(255,255,255,0.3)">—</span>'}
+            </div>
+          </a>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+function fmtSize(b) {
+  if (!b) return '';
+  if (b < 1024) return b+'B';
+  if (b < 1048576) return (b/1024).toFixed(0)+'KB';
+  return (b/1048576).toFixed(1)+'MB';
+}
+
+// ── About page dynamic content ────────────────────────────────────
+async function loadAboutPage() {
+  const pages = await callApi('/api/pages');
+  if (!pages) return;
+  const about = pages.find(p => p.slug === 'about');
+  const home  = pages.find(p => p.slug === 'home');
+  if (about) {
+    if (about.content) document.getElementById('about-content-main').textContent = about.content;
+    if (about.mission) document.getElementById('about-mission').textContent = about.mission;
+    if (about.vision)  document.getElementById('about-vision').textContent = about.vision;
+  }
+  if (home) {
+    if (home.heroTitle)    document.getElementById('hero-title').innerHTML = home.heroTitle.replace('tous', '<span class="highlight">tous</span>');
+    if (home.heroSubtitle) document.getElementById('hero-sub').textContent = home.heroSubtitle;
+    if (home.missionText)  {
+      const el = document.getElementById('home-mission-text');
+      if (el) el.textContent = home.missionText;
+    }
+  }
+}
+
+// ── Contact form ──────────────────────────────────────────────────
+async function handleForm(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn  = form.querySelector('[type="submit"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+
+  try {
+    const r = await fetch(API + '/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:    document.getElementById('c-name').value,
+        email:   document.getElementById('c-email').value,
+        subject: document.getElementById('c-subject').value,
+        message: document.getElementById('c-message').value
+      })
+    });
+    if (r.ok) {
+      document.getElementById('form-success').style.display = 'block';
+      form.reset();
+    }
+  } catch {}
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Send message'; }
+}
+
+// ── Utils ─────────────────────────────────────────────────────────
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(0)+' KB';
+  return (bytes/(1024*1024)).toFixed(1)+' MB';
+}
+
+// openResource — conservé pour compatibilité CSS onclick legacy
+function openResource(el) {
+  const url = el.getAttribute('data-url');
+  if (url && url !== '#' && url !== '') window.open(url, '_blank');
+}
+
+
+// ── Boot ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadHomeArticles();
+  await loadAboutPage();
+});
+</script>
+</body>
+</html>

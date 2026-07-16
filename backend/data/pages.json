@@ -1,0 +1,21 @@
+[
+  {
+    "slug": "home",
+    "heroTitle": "Defending the rights of everyone in Dominica",
+    "heroSubtitle": "MiRiDom (Minority Rights Dominica) is an organization advocating for the fundamental rights of the LGBTQ+ community in Dominica. Together, let's build a more just and inclusive society.",
+    "missionText": "Our mission is to promote, protect, and defend the fundamental rights of all people, regardless of their sexual orientation or gender identity, in Dominica and across the Caribbean.",
+    "updatedAt": "2026-04-14T06:05:20.194Z"
+  },
+  {
+    "slug": "about",
+    "content": "MiRiDom (Minority Rights Dominica) is a civil society organization founded to defend the human rights of all people in Dominica, with a particular focus on the LGBTQ+ community.",
+    "mission": "To promote, protect, and defend the fundamental rights of all people in Dominica.",
+    "vision": "A Dominica where every person lives freely, with dignity and in safety.",
+    "updatedAt": "2026-04-14T06:05:20.194Z"
+  },
+  {
+    "slug": "legal",
+    "content": "MiRiDom is a non-profit organization. All information published on this site is provided for informational purposes only.",
+    "updatedAt": "2026-04-14T06:05:20.194Z"
+  }
+]

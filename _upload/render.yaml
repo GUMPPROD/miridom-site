@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: miridom
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.1
+    # ── Pour passer en payant avec données persistantes (plus tard) ──
+    # 1) Changer "plan: free" en "plan: starter"
+    # 2) Décommenter le disque et les variables ci-dessous :
+    # disk:
+    #   name: miridom-data
+    #   mountPath: /data
+    #   sizeGB: 1
+    # (et ajouter dans envVars :)
+    #   - key: DATA_DIR
+    #     value: /data/data
+    #   - key: UPLOADS_DIR
+    #     value: /data/uploads

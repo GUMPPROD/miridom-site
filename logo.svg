@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 110" width="480" height="110">
+  <defs>
+    <!-- Rainbow gradient for checkmark -->
+    <linearGradient id="rainbow-ck" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#FF0000"/>
+      <stop offset="20%"  stop-color="#FF7700"/>
+      <stop offset="40%"  stop-color="#FFD700"/>
+      <stop offset="55%"  stop-color="#00BB00"/>
+      <stop offset="75%"  stop-color="#0057FF"/>
+      <stop offset="90%"  stop-color="#7B00D4"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ── MiRiDom wordmark ── -->
+  <text
+    x="0" y="77"
+    font-family="'Inter','Arial Black',sans-serif"
+    font-weight="900"
+    font-size="82"
+    letter-spacing="-2"
+    fill="currentColor">MiRiDom</text>
+
+  <!-- ── Partial circle arc (right side of logo) ── -->
+  <!-- Arc goes from bottom-left (~200°) to top-right (~60°) clockwise -->
+  <path
+    d="M 430,98 A 52,52 0 1,1 464,26"
+    stroke="currentColor"
+    stroke-width="4.5"
+    stroke-linecap="round"
+    fill="none"
+    opacity="0.9"/>
+
+  <!-- ── Rainbow checkmark ── -->
+  <!-- Short leg: goes down-right; long leg: goes up-right -->
+  <path
+    d="M 350,38 L 370,62 L 415,10"
+    stroke="url(#rainbow-ck)"
+    stroke-width="13"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"/>
+
+  <!-- ── Subtitle ── -->
+  <text
+    x="1" y="103"
+    font-family="'Inter',Arial,sans-serif"
+    font-weight="400"
+    font-size="13.5"
+    letter-spacing="3.8"
+    fill="currentColor"
+    opacity="0.85">MINORITY RIGHTS DOMINICA</text>
+</svg>
