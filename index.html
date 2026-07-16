@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MiRiDom — Minority Rights Dominica</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <style>
@@ -61,6 +63,12 @@
       border: none;
     }
     .btn-nav-cta:hover { background: rgba(255,255,255,0.9); transform: translateY(-1px); }
+    #nav-burger {
+      display: none;
+      background: transparent; border: none; cursor: pointer;
+      padding: 8px; margin-left: 4px;
+      align-items: center; justify-content: center;
+    }
 
     /* ── Hero ── */
     .hero {
@@ -362,16 +370,152 @@
     @media (max-width: 768px) {
       #main-nav { padding: 16px 20px; }
       #main-nav.scrolled { padding: 12px 20px; }
-      .nav-links { display: none; }
       .hero-content { padding: 0 24px 60px; }
-      .hero-h1 { font-size: 44px; }
+      .hero-h1 { font-size: 40px; word-break: break-word; overflow-wrap: anywhere; }
       .section { padding: 60px 24px; }
       .hero-scroll { right: 24px; }
       .page-header { padding: 120px 24px 40px; }
+      .page-header-h1 { word-break: break-word; overflow-wrap: anywhere; }
       footer { padding: 40px 24px 32px; }
       .full-cta-content { padding: 60px 24px; }
       .about-hero-content { padding: 0 24px 40px; }
       .cta-stepup { display: none; }
+
+      /* ── Mobile navigation (hamburger) ── */
+      #nav-burger { display: flex; }
+      .btn-nav-cta { display: none; }
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        position: absolute;
+        top: 100%; left: 0; right: 0;
+        background: rgba(10,15,13,0.98);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 8px 0;
+        border-top: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      }
+      .nav-links.open .nav-link {
+        width: 100%;
+        text-align: left;
+        padding: 14px 24px;
+        font-size: 16px;
+        border-radius: 0;
+        color: white;
+      }
+
+      /* ── Collapse all multi-column grids to a single column ── */
+      .m-collapse,
+      #home-articles-list,
+      #media-grid,
+      #actualites-list {
+        grid-template-columns: 1fr !important;
+        min-width: 0;
+      }
+      /* Image collage: drop fixed rows/height so it stacks cleanly */
+      .m-collage {
+        grid-template-rows: auto !important;
+        height: auto !important;
+      }
+      .m-collage > * {
+        height: 220px !important;
+        grid-row: auto !important;
+      }
+
+      /* ── Titles wrap cleanly, cards can shrink ── */
+      .article-card { min-width: 0; }
+      .article-card-title,
+      .article-card-cat,
+      .article-card-excerpt {
+        word-break: break-word;
+        overflow-wrap: anywhere;
+      }
+
+      /* ── Reduce oversized inline horizontal padding on wide blocks ── */
+      [style*="padding:100px 60px"],
+      [style*="padding:80px 60px"],
+      [style*="padding:40px 60px"],
+      [style*="padding:60px"] {
+        padding-left: 22px !important;
+        padding-right: 22px !important;
+      }
+
+      /* ════════ Mobile polish pass v2 (≤768px only) ════════ */
+
+      /* ── Hard guard against any horizontal overflow ── */
+      html, body { max-width: 100%; overflow-x: hidden; }
+      img, svg, video, iframe { max-width: 100%; }
+      * { min-width: 0; }
+
+      /* ── 1. Page inner headers ── */
+      .page-header { padding: 104px 22px 36px !important; }
+      .page-header-h1 { font-size: 34px !important; letter-spacing: -1px !important; line-height: 1.12 !important; }
+      .page-header-sub { font-size: 15px !important; margin-top: 10px !important; }
+      .section-tag { font-size: 10px !important; letter-spacing: 2px !important; }
+      .section-tag::before { width: 18px !important; }
+
+      /* ── 2. Hero (home) ── */
+      .hero { min-height: 560px !important; }
+      .hero-content { padding: 0 22px 52px !important; max-width: 100% !important; }
+      .hero-h1 { font-size: 38px !important; letter-spacing: -1px !important; line-height: 1.08 !important; margin-bottom: 18px !important; }
+      .hero-sub { font-size: 15px !important; line-height: 1.6 !important; margin-bottom: 26px !important; max-width: 100% !important; }
+      .hero-ctas { flex-direction: column; align-items: stretch; width: 100%; gap: 10px; }
+      .hero-ctas > button { width: 100%; justify-content: center; }
+      .hero-scroll { display: none !important; }
+
+      /* ── Section headings / body ── */
+      .section-h2 { font-size: 30px !important; letter-spacing: -1px !important; line-height: 1.15 !important; }
+      .section-body { font-size: 15px !important; }
+      .split-img { min-height: 300px !important; }
+
+      /* Section header rows (title + inline link) wrap instead of squashing */
+      [style*="align-items:flex-end"][style*="justify-content:space-between"] {
+        flex-wrap: wrap !important;
+        gap: 16px !important;
+        margin-bottom: 32px !important;
+      }
+
+      /* ── 3. Contact page ── */
+      #page-contact [style*="padding:140px 60px 60px"] { padding: 104px 20px 44px !important; }
+      #page-contact [style*="padding:44px"] { padding: 24px 20px !important; border-radius: 20px !important; }
+      #page-contact h1 { font-size: 36px !important; letter-spacing: -1px !important; }
+      .contact-input { font-size: 16px !important; padding: 14px 16px !important; }
+      textarea.contact-input { min-height: 130px; }
+
+      /* ── 4. About page ── */
+      .about-hero { height: 46vh !important; min-height: 320px !important; }
+      .about-hero-content h1 { font-size: 36px !important; letter-spacing: -1px !important; }
+
+      /* Full-width CTA blocks (home + about) heading shrink */
+      .full-cta { min-height: 420px !important; }
+      .full-cta-content { max-width: 100% !important; }
+      .full-cta-content h2 { font-size: 32px !important; letter-spacing: -1px !important; line-height: 1.1 !important; }
+      .full-cta-content p { font-size: 15px !important; max-width: 100% !important; }
+      .full-cta-content > div[style*="flex-wrap:wrap"] { width: 100%; }
+
+      /* ── 5. Rights page ── */
+      [style*="padding:0 60px 60px"] { padding-left: 20px !important; padding-right: 20px !important; }
+      #page-droits h1 { font-size: 34px !important; letter-spacing: -1px !important; }
+      #page-droits h2 { font-size: 26px !important; letter-spacing: -0.5px !important; }
+
+      /* ── Footer bottom row stacks ── */
+      .footer-divider + div {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+      }
+
+      /* ── 6. Comfortable tap targets everywhere ── */
+      .btn-primary, .btn-outline, .btn-primary-hero,
+      .btn-secondary-hero, .btn-nav-cta, .filter-pill,
+      .article-card-link { min-height: 44px; }
+      .btn-primary, .btn-outline, .btn-primary-hero, .btn-secondary-hero {
+        display: inline-flex; align-items: center;
+      }
     }
   </style>
 </head>
@@ -394,6 +538,13 @@
     <button class="nav-link" data-page="droits" onclick="showPage('droits')">Rights</button>
     <button class="nav-link" data-page="contact" onclick="showPage('contact')">Contact</button>
   </div>
+  <button id="nav-burger" onclick="toggleMobileMenu()" aria-label="Menu">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </button>
   <button class="btn-nav-cta" onclick="showPage('contact')">Contact us</button>
 </nav>
 
@@ -405,7 +556,6 @@
     <div class="hero-bg" id="hero-bg" style="background-image: url('https://images.unsplash.com/photo-1748810859309-b943147cdda2?q=85&w=1920&auto=format&fit=crop')"></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <div class="hero-tag">Human rights advocacy organization</div>
       <h1 class="hero-h1" id="hero-title">Defending the rights<br>of <span class="highlight">everyone</span> in<br>Dominica</h1>
       <p class="hero-sub" id="hero-sub">MiRiDom advocates for the fundamental rights of the LGBTQ+ community in Dominica. Together, let's build a more just and inclusive society.</p>
       <div class="hero-ctas">
@@ -424,7 +574,7 @@
 
   <!-- STATS -->
   <div class="stats-strip">
-    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);">
+    <div class="m-collapse" style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);">
       <div class="stat-item" style="border-right:1px solid rgba(255,255,255,0.06)">
         <div class="stat-number">2020</div>
         <div class="stat-label">Year founded</div>
@@ -446,7 +596,7 @@
 
   <!-- MISSION SPLIT -->
   <section style="background:#F9FAFB; padding:100px 60px;">
-    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;">
+    <div class="m-collapse" style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;">
       <div>
         <div class="section-tag">Our mission</div>
         <h2 class="section-h2 dark" style="margin-bottom:24px" id="home-mission-title">Promoting human dignity for all</h2>
@@ -592,7 +742,7 @@
 
   <!-- COMMUNITY SECTION -->
   <section style="background:#F9FAFB;padding:100px 60px">
-    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center">
+    <div class="m-collapse" style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center">
       <div style="position:relative">
         <img src="/step-up.png" alt="Step Up! So others don't get stepped on — MiRiDom campaign"
           style="width:100%;height:auto;border-radius:24px;display:block;box-shadow:0 32px 64px rgba(0,0,0,0.12)" />
@@ -603,7 +753,7 @@
         <p class="section-body dark" style="margin-bottom:40px">
           MiRiDom brings together people from all walks of life around a common goal: building a Dominica where every individual can live with dignity, free from discrimination and violence.
         </p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px">
+        <div class="m-collapse" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px">
           <div style="background:white;border-radius:16px;padding:24px;box-shadow:0 4px 16px rgba(0,0,0,0.06)">
             <div style="font-size:32px;font-weight:800;color:#059669;font-family:'Plus Jakarta Sans',sans-serif">150+</div>
             <div style="font-size:14px;color:#6B7280;margin-top:4px">Documented cases</div>
@@ -627,7 +777,7 @@
           <h2 class="section-h2 light" style="max-width:500px">Caribbean pride, in all its diversity</h2>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:2fr 1fr;grid-template-rows:220px 220px;gap:12px;border-radius:24px;overflow:hidden;height:452px">
+      <div class="m-collapse m-collage" style="display:grid;grid-template-columns:2fr 1fr;grid-template-rows:220px 220px;gap:12px;border-radius:24px;overflow:hidden;height:452px">
         <!-- Grande image gauche sur toute la hauteur -->
         <img src="https://images.unsplash.com/photo-1767801829414-2a0a9160a3a8?q=80&w=1200&auto=format&fit=crop"
           alt="Caribbean street festival"
@@ -672,7 +822,7 @@
   </section>
 
   <section style="background:#F9FAFB;padding:80px 60px">
-    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px">
+    <div class="m-collapse" style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px">
       <div style="background:white;border-radius:24px;padding:40px;box-shadow:0 4px 24px rgba(0,0,0,0.06);border-top:3px solid #059669">
         <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#059669;margin-bottom:16px">Our mission</div>
         <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:#111827;margin-bottom:16px">Mission</h3>
@@ -741,7 +891,7 @@
 <div id="page-contact" class="page">
   <div style="min-height:100vh;background:var(--dark);display:flex;flex-direction:column">
     <div style="flex:1;padding:140px 60px 60px">
-      <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start">
+      <div class="m-collapse" style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start">
         <!-- Info side -->
         <div>
           <div class="section-tag">Contact</div>
@@ -775,7 +925,7 @@
         <!-- Form side -->
         <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:28px;padding:44px">
           <form onsubmit="handleForm(event)">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+            <div class="m-collapse" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
               <div>
                 <label class="contact-label" for="c-name">Your name *</label>
                 <input id="c-name" name="name" required class="contact-input" placeholder="Jane Doe" />
@@ -872,7 +1022,7 @@
 <!-- ══════════════════════════════════════════ FOOTER ══ -->
 <footer>
   <div style="max-width:1100px;margin:0 auto">
-    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px">
+    <div class="m-collapse" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px">
       <div>
         <div style="margin-bottom:16px">
           <img src="/logo.svg" alt="MiRiDom" style="height:36px;width:auto;filter:brightness(0) invert(0.7)"
@@ -934,7 +1084,12 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 // ── Navigation ────────────────────────────────────────────────────
+function toggleMobileMenu() {
+  document.getElementById('nav-links').classList.toggle('open');
+}
+
 function showPage(pageId) {
+  var _nl = document.getElementById('nav-links'); if (_nl) _nl.classList.remove('open');
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('[data-page]').forEach(el => el.classList.remove('active'));
 
