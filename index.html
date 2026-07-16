@@ -516,6 +516,9 @@
       .btn-primary, .btn-outline, .btn-primary-hero, .btn-secondary-hero {
         display: inline-flex; align-items: center;
       }
+      /* Resources cards: aérer le texte, bouton pleine largeur en dessous */
+      .res-item { flex-wrap: wrap !important; padding: 16px !important; row-gap: 12px !important; }
+      .res-item > *:last-child { flex: 1 0 100% !important; justify-content: center !important; }
     }
   </style>
 </head>
@@ -1247,7 +1250,7 @@ function renderRessources() {
       <div style="display:flex;flex-direction:column;gap:10px">
         ${docs.map(r => {
           const url = r.url || '';
-          return `<a ${url ? `href="${url}" download` : 'href="#"'}
+          return `<a class="res-item" ${url ? `href="${url}" download` : 'href="#"'}
             style="display:flex;align-items:center;gap:16px;padding:20px 22px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:14px;text-decoration:none;cursor:${url?'pointer':'default'};transition:background .2s,border-color .2s"
             onmouseover="if('${url}'){this.style.background='rgba(5,150,105,0.1)';this.style.borderColor='rgba(52,211,153,0.3)'}"
             onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,0.07)'"
@@ -1282,7 +1285,7 @@ function renderRessources() {
       <div style="display:flex;flex-direction:column;gap:10px">
         ${liens.map(r => {
           const url = r.url && r.url !== '#' ? r.url : '';
-          return `<a ${url ? `href="${url}" target="_blank" rel="noopener"` : 'href="#"'}
+          return `<a class="res-item" ${url ? `href="${url}" target="_blank" rel="noopener"` : 'href="#"'}
             style="display:flex;align-items:center;gap:16px;padding:20px 22px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:14px;text-decoration:none;cursor:${url?'pointer':'default'};transition:background .2s,border-color .2s"
             onmouseover="if('${url}'){this.style.background='rgba(5,150,105,0.1)';this.style.borderColor='rgba(52,211,153,0.3)'}"
             onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,0.07)'"

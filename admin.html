@@ -41,6 +41,64 @@
     .radio-option { display:flex;align-items:center;gap:8px;padding:12px 16px;border:1.5px solid #E5E7EB;border-radius:10px;cursor:pointer;transition:all .2s;user-select:none; }
     .radio-option.selected { border-color:#059669;background:#F0FDF4; }
     .radio-option input { accent-color:#059669; }
+
+    /* Wrapper so wide tables scroll horizontally within their card instead of breaking the page */
+    .table-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+
+    /* Mobile top bar + off-canvas sidebar (hidden on desktop) */
+    .admin-topbar { display:none; }
+    .admin-backdrop { display:none; }
+
+    /* ── MOBILE (≤768px) ──────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      html, body { max-width:100%; overflow-x:hidden; }
+      * { min-width:0; }
+
+      /* Off-canvas drawer sidebar */
+      #adminSidebar {
+        transform: translateX(-100%);
+        transition: transform .25s ease;
+        z-index: 1000;
+        width: 15rem;
+      }
+      #adminSidebar.open { transform: translateX(0); }
+
+      /* Dark backdrop behind the open drawer */
+      .admin-backdrop {
+        position: fixed; inset:0; background: rgba(0,0,0,0.5);
+        z-index: 999;
+      }
+
+      /* Mobile top bar with hamburger */
+      .admin-topbar {
+        display:flex; align-items:center; gap:12px;
+        background:#071210; padding:12px 16px;
+        position:sticky; top:0; z-index:30;
+      }
+      .admin-hamburger {
+        background:transparent; border:none; color:#fff;
+        display:flex; align-items:center; justify-content:center;
+        width:44px; height:44px; margin:-10px 0 -10px -10px; cursor:pointer;
+      }
+
+      /* Main content takes full width (remove desktop sidebar offset) */
+      main.ml-64 { margin-left:0 !important; padding:16px !important; }
+
+      /* Tables scroll within their card and stay readable */
+      .data-table { min-width:560px; }
+
+      /* Modals fit the viewport */
+      .modal-box { width:92%; max-width:92%; padding:20px; max-height:90vh; overflow-y:auto; }
+
+      /* Inputs full-width + 16px to avoid iOS zoom */
+      .form-input, .editor { width:100%; font-size:16px; }
+
+      /* Tappable buttons */
+      .btn-green, .btn-gray { min-height:44px; }
+
+      /* Section headers stack nicely */
+      section .flex.items-center.justify-between { flex-wrap:wrap; gap:12px; }
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -71,10 +129,22 @@
 
 <!-- ── APP ──────────────────────────────────────────────────────────────── -->
 <div id="app" style="display:none">
+
+  <!-- Mobile top bar (visible ≤768px only) -->
+  <div id="adminTopbar" class="admin-topbar">
+    <button type="button" onclick="toggleAdminSidebar()" class="admin-hamburger" aria-label="Menu">
+      <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <img src="/logo.svg" alt="MiRiDom" class="h-7" style="filter:brightness(0) invert(1)" onerror="this.style.display='none'" />
+  </div>
+
+  <!-- Mobile drawer backdrop -->
+  <div id="adminBackdrop" class="admin-backdrop" onclick="toggleAdminSidebar()"></div>
+
   <div class="flex min-h-screen">
 
     <!-- Sidebar -->
-    <aside class="w-64 flex flex-col fixed top-0 left-0 h-screen z-10" style="background:#071210">
+    <aside id="adminSidebar" class="w-64 flex flex-col fixed top-0 left-0 h-screen z-10" style="background:#071210">
       <div class="p-5 border-b border-white/8">
         <div class="flex items-center gap-3">
           <img src="/logo.svg" alt="MiRiDom" class="h-8" style="filter:brightness(0) invert(1)" onerror="this.style.display='none'" />
@@ -365,7 +435,13 @@ async function apiFetch(method, path, body) {
   if (token()) opts.headers['Authorization'] = 'Bearer ' + token();
   if (body) opts.body = JSON.stringify(body);
   const r = await fetch(API + path, opts);
-  if (r.status === 401) { logout(); return null; }
+  if (r.status === 401) {
+    if (path.indexOf('/auth/login') !== -1) {
+      const e = await r.json().catch(()=>({}));
+      throw new Error(e.error || 'Invalid email or password.');
+    }
+    logout(); return null;
+  }
   if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.error || r.statusText); }
   return r.json();
 }
@@ -425,8 +501,23 @@ async function changePassword() {
   } catch(ex) { err.textContent = ex.message; err.classList.remove('hidden'); }
 }
 
+// ── Mobile sidebar drawer ──────────────────────────────────────────────────
+function toggleAdminSidebar() {
+  const s = document.getElementById('adminSidebar');
+  const b = document.getElementById('adminBackdrop');
+  const open = s.classList.toggle('open');
+  if (b) b.style.display = open ? 'block' : 'none';
+}
+function closeAdminSidebar() {
+  const s = document.getElementById('adminSidebar');
+  const b = document.getElementById('adminBackdrop');
+  if (s) s.classList.remove('open');
+  if (b) b.style.display = 'none';
+}
+
 // ── Nav ───────────────────────────────────────────────────────────────────
 function showSection(name) {
+  closeAdminSidebar();
   document.querySelectorAll('[data-section]').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('[data-nav]').forEach(el => el.classList.remove('active'));
   const sec = document.querySelector('[data-section="' + name + '"]');
@@ -465,7 +556,7 @@ async function loadDashboard() {
 }
 
 function makeTable(cols, rows) {
-  return '<table class="data-table"><thead><tr>' + cols.map(c=>'<th>'+c+'</th>').join('') + '<th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+  return '<div class="table-scroll"><table class="data-table"><thead><tr>' + cols.map(c=>'<th>'+c+'</th>').join('') + '<th></th></tr></thead><tbody>' + rows + '</tbody></table></div>';
 }
 
 // ── NEWS ───────────────────────────────────────────────────────────────────
