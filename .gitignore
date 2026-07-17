@@ -11,6 +11,10 @@ cf.tgz
 # macOS
 .DS_Store
 
+# Dossiers de préparation locaux
+_upload/
+miridom-upload/
+
 # Scripts locaux (inutiles en ligne)
 LANCER_LE_SITE.command
 PARTAGER_EN_LIGNE.command
