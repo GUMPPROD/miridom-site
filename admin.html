@@ -160,6 +160,10 @@
           <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           News <span id="nav-actu-badge" class="ml-auto text-xs bg-green-700 text-white px-1.5 py-0.5 rounded-full" style="display:none"></span>
         </button>
+        <button onclick="showSection('media')" class="sidebar-link" data-nav="media">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+          In the Media
+        </button>
         <button onclick="showSection('resources')" class="sidebar-link" data-nav="resources">
           <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
           Resources & Docs
@@ -232,6 +236,17 @@
         </div>
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div id="actualites-list"><div class="p-12 text-center text-gray-400">Loading…</div></div>
+        </div>
+      </section>
+
+      <!-- ── IN THE MEDIA ── -->
+      <section data-section="media">
+        <div class="flex items-center justify-between mb-8">
+          <div><h2 class="text-2xl font-bold text-gray-900">In the Media</h2><p class="text-gray-500 text-sm mt-1">Press coverage and external mentions</p></div>
+          <button onclick="openMediaModal(null)" class="btn-green">+ New media item</button>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div id="media-list"><div class="p-12 text-center text-gray-400">Loading…</div></div>
         </div>
       </section>
 
@@ -343,9 +358,52 @@
           <div id="actu-content" contenteditable="true" class="editor"></div>
         </div>
       </div>
+      <div>
+        <label class="form-label">Image (optional)</label>
+        <div class="upload-zone" id="actu-image-zone" onclick="document.getElementById('actu-image-input').click()">
+          <svg class="w-7 h-7 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <p class="text-sm text-gray-500" id="actu-image-label">Click to select an image</p>
+          <p class="text-xs text-gray-400 mt-1">JPG, PNG, WEBP — max 20 MB</p>
+        </div>
+        <input type="file" id="actu-image-input" class="hidden" accept="image/*" onchange="handleActuImageSelect(event)" />
+        <img id="actu-image-preview" class="hidden mt-3 rounded-lg border border-gray-200 max-h-40 object-cover" />
+      </div>
       <div class="flex gap-3 pt-2">
         <button onclick="saveActu()" class="btn-green flex-1">Save</button>
         <button onclick="document.getElementById('actuModal').style.display='none'" class="btn-gray">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MEDIA MODAL ── -->
+<div id="mediaModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-bold text-gray-900" id="media-modal-title">New media item</h3>
+      <button onclick="document.getElementById('mediaModal').style.display='none'" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+    </div>
+    <input type="hidden" id="media-id" />
+    <div class="space-y-4">
+      <div><label class="form-label">Title *</label><input id="media-title" type="text" class="form-input" /></div>
+      <div><label class="form-label">Source / Publication</label><input id="media-source" type="text" class="form-input" placeholder="e.g. OutRight Action International" /></div>
+      <div><label class="form-label">Link URL</label><input id="media-url" type="url" class="form-input" placeholder="https://…" /></div>
+      <div>
+        <label class="form-label">Image (optional)</label>
+        <div class="upload-zone" id="media-image-zone" onclick="document.getElementById('media-image-input').click()">
+          <svg class="w-7 h-7 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <p class="text-sm text-gray-500" id="media-image-label">Click to select an image</p>
+          <p class="text-xs text-gray-400 mt-1">JPG, PNG, WEBP — max 20 MB</p>
+        </div>
+        <input type="file" id="media-image-input" class="hidden" accept="image/*" onchange="handleMediaImageSelect(event)" />
+        <img id="media-image-preview" class="hidden mt-3 rounded-lg border border-gray-200 max-h-40 object-cover" />
+      </div>
+      <div><label class="form-label">Status</label>
+        <select id="media-status" class="form-input"><option value="active">Active</option><option value="inactive">Inactive</option></select>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button onclick="saveMedia()" class="btn-green flex-1">Save</button>
+        <button onclick="document.getElementById('mediaModal').style.display='none'" class="btn-gray">Cancel</button>
       </div>
     </div>
   </div>
@@ -465,7 +523,7 @@ function initApp(user) {
   document.getElementById('userName').textContent    = user.name || 'Admin';
   document.getElementById('userEmail').textContent   = user.email;
   document.getElementById('userInitial').textContent = (user.name || 'A')[0].toUpperCase();
-  loadDashboard(); loadActualites(); loadResources(); loadMessages(); loadPages();
+  loadDashboard(); loadActualites(); loadMedia(); loadResources(); loadMessages(); loadPages();
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────
@@ -561,6 +619,7 @@ function makeTable(cols, rows) {
 
 // ── NEWS ───────────────────────────────────────────────────────────────────
 let _actus = [];
+let _pendingActuImage = null;
 async function loadActualites() {
   try { _actus = await apiFetch('GET', '/api/articles') || []; renderActus(); }
   catch(e) { document.getElementById('actualites-list').innerHTML = err(e.message); }
@@ -585,14 +644,101 @@ function openActuModal(a) {
   sv('actu-id', a?.id||''); sv('actu-title', a?.title||'');
   sv('actu-status', a?.status||'draft'); sv('actu-date', a?.date||today()); sv('actu-excerpt', a?.excerpt||'');
   document.getElementById('actu-content').innerHTML = a?.content||'';
+  _pendingActuImage = null;
+  document.getElementById('actu-image-label').textContent = 'Click to select an image';
+  document.getElementById('actu-image-zone').className = 'upload-zone';
+  const prev = document.getElementById('actu-image-preview');
+  if (a?.image) { prev.src = a.image; prev.classList.remove('hidden'); }
+  else { prev.src = ''; prev.classList.add('hidden'); }
   document.getElementById('actuModal').style.display = 'flex';
 }
 function editActu(id) { openActuModal(_actus.find(a=>a.id===id)); }
+
+function handleActuImageSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 20 * 1024 * 1024) { toast('File too large (max 20 MB)', 'red'); return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    _pendingActuImage = { filename: file.name, filedata: e.target.result.split(',')[1], mimetype: file.type };
+    document.getElementById('actu-image-label').textContent = '✓ ' + file.name + ' (' + fmtSize(file.size) + ')';
+    document.getElementById('actu-image-zone').className = 'upload-zone active';
+    const prev = document.getElementById('actu-image-preview');
+    prev.src = e.target.result;
+    prev.classList.remove('hidden');
+  };
+  reader.readAsDataURL(file);
+}
+
 async function saveActu() {
   const id = v('actu-id');
   const body = { title:v('actu-title'), status:v('actu-status'), date:v('actu-date'), excerpt:v('actu-excerpt'), content:document.getElementById('actu-content').innerHTML };
   if (!body.title) { toast('Title required','red'); return; }
+  if (_pendingActuImage) Object.assign(body, _pendingActuImage);
   try { if(id) await apiFetch('PUT','/api/articles/'+id,body); else await apiFetch('POST','/api/articles',body); document.getElementById('actuModal').style.display='none'; toast('Saved ✓'); loadActualites(); loadDashboard(); } catch(e) { toast(e.message,'red'); }
+}
+
+// ── IN THE MEDIA ─────────────────────────────────────────────────────────────
+let _media = [];
+let _pendingMediaImage = null;
+async function loadMedia() {
+  try { _media = await apiFetch('GET', '/api/media') || []; renderMedia(); }
+  catch(e) { document.getElementById('media-list').innerHTML = err(e.message); }
+}
+
+function renderMedia() {
+  const el = document.getElementById('media-list');
+  if (!_media.length) { el.innerHTML = '<div class="p-12 text-center text-gray-400"><p class="mb-3">No media items</p><button onclick="openMediaModal(null)" class="btn-green">Create the first one</button></div>'; return; }
+  el.innerHTML = makeTable(['Title','Source','Link','Status'], _media.map(m => {
+    const thumb = m.image ? '<img src="' + esc(m.image) + '" class="w-10 h-10 rounded object-cover flex-shrink-0" />' : '';
+    const link = (m.url && m.url !== '#' && m.url !== '')
+      ? '<a href="' + esc(m.url) + '" target="_blank" class="text-blue-600 text-xs font-medium hover:underline">↗ Open</a>'
+      : '<span class="text-gray-300 text-xs">—</span>';
+    return '<tr>' +
+      '<td class="font-medium text-gray-900 max-w-xs"><div class="flex items-center gap-3">' + thumb + '<div class="truncate">' + esc(m.title) + '</div></div></td>' +
+      '<td class="text-gray-500 text-sm">' + esc(m.source||'') + '</td>' +
+      '<td>' + link + '</td>' +
+      '<td><span class="' + (m.status==='active'?'badge-green':'badge-yellow') + '">' + (m.status==='active'?'Active':'Inactive') + '</span></td>' +
+      '<td><div class="flex gap-2 justify-end"><button onclick="editMedia(\'' + m.id + '\')" class="text-green-600 text-xs font-medium hover:text-green-800">Edit</button><button onclick="deleteItem(\'media\',\'' + m.id + '\')" class="btn-red">Delete</button></div></td></tr>';
+  }).join(''));
+}
+
+function openMediaModal(m) {
+  document.getElementById('media-modal-title').textContent = m ? 'Edit' : 'New media item';
+  sv('media-id', m?.id||''); sv('media-title', m?.title||'');
+  sv('media-source', m?.source||''); sv('media-url', m?.url||''); sv('media-status', m?.status||'active');
+  _pendingMediaImage = null;
+  document.getElementById('media-image-label').textContent = 'Click to select an image';
+  document.getElementById('media-image-zone').className = 'upload-zone';
+  const prev = document.getElementById('media-image-preview');
+  if (m?.image) { prev.src = m.image; prev.classList.remove('hidden'); }
+  else { prev.src = ''; prev.classList.add('hidden'); }
+  document.getElementById('mediaModal').style.display = 'flex';
+}
+function editMedia(id) { openMediaModal(_media.find(m=>m.id===id)); }
+
+function handleMediaImageSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 20 * 1024 * 1024) { toast('File too large (max 20 MB)', 'red'); return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    _pendingMediaImage = { filename: file.name, filedata: e.target.result.split(',')[1], mimetype: file.type };
+    document.getElementById('media-image-label').textContent = '✓ ' + file.name + ' (' + fmtSize(file.size) + ')';
+    document.getElementById('media-image-zone').className = 'upload-zone active';
+    const prev = document.getElementById('media-image-preview');
+    prev.src = e.target.result;
+    prev.classList.remove('hidden');
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveMedia() {
+  const id = v('media-id');
+  const body = { title:v('media-title'), source:v('media-source'), url:v('media-url'), status:v('media-status') };
+  if (!body.title) { toast('Title required','red'); return; }
+  if (_pendingMediaImage) Object.assign(body, _pendingMediaImage);
+  try { if(id) await apiFetch('PUT','/api/media/'+id,body); else await apiFetch('POST','/api/media',body); document.getElementById('mediaModal').style.display='none'; toast('Saved ✓'); loadMedia(); } catch(e) { toast(e.message,'red'); }
 }
 
 // ── RESOURCES & DOCUMENTS ──────────────────────────────────────────────────
@@ -779,6 +925,7 @@ async function deleteItem(type, id) {
   try {
     await apiFetch('DELETE','/api/'+type+'/'+id); toast('Deleted');
     if (type==='articles') { loadActualites(); loadDashboard(); }
+    if (type==='media') loadMedia();
     if (type==='resources') { loadResources(); loadDashboard(); }
     if (type==='messages') loadMessages();
   } catch(e) { toast(e.message,'red'); }

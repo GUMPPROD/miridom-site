@@ -118,6 +118,18 @@ function initData() {
     }]);
   }
 
+  // In the Media
+  if (!fs.existsSync(path.join(DATA, 'media.json'))) {
+    const now = new Date().toISOString();
+    write('media.json', [
+      { id: uid(), title: "DOMINICA: 'It's an ongoing journey to achieve full inclusion and acceptance of LGBTQI+ people'", source: 'OutRight Action International', url: '#', image: 'https://images.unsplash.com/photo-1573339584805-6ed85958b6e8?q=80&w=600&auto=format&fit=crop', status: 'active', createdAt: now, updatedAt: now },
+      { id: uid(), title: 'MiRiDom celebrates and welcomes court ruling', source: 'MiRiDom', url: '#', image: 'https://images.unsplash.com/photo-1596247851352-5b908d61c6fc?q=80&w=600&auto=format&fit=crop', status: 'active', createdAt: now, updatedAt: now },
+      { id: uid(), title: 'Progress in the Caribbean as Dominica Decriminalizes Same-Sex Relations', source: 'ILGA World', url: '#', image: 'https://images.unsplash.com/photo-1748810859309-b943147cdda2?q=80&w=600&auto=format&fit=crop', status: 'active', createdAt: now, updatedAt: now },
+      { id: uid(), title: 'MiRiDom has released its recommendations to the Government of Dominica requesting Policy Change for equal rights for the LGBTQI Community and Electoral Reform', source: 'MiRiDom', url: '#', image: 'https://images.unsplash.com/photo-1575221165108-1c5d11ee1c51?q=80&w=600&auto=format&fit=crop', status: 'active', createdAt: now, updatedAt: now },
+      { id: uid(), title: 'MiRiDom Welcomes High Court Ruling Declaring Buggery Laws in Dominica Unconstitutional', source: 'MiRiDom', url: '#', image: 'https://images.unsplash.com/photo-1550338649-0131b8cec2d7?q=80&w=600&auto=format&fit=crop', status: 'active', createdAt: now, updatedAt: now }
+    ]);
+  }
+
   // Ressources (avec support fichier)
   if (!fs.existsSync(path.join(DATA, 'resources.json'))) {
     write('resources.json', [
@@ -189,7 +201,12 @@ app.get('/api/articles/:id', optionalAuth, (req, res) => {
 
 app.post('/api/articles', requireAuth, (req, res) => {
   const arts = read('articles.json');
-  const art  = { id: uid(), title: req.body.title || 'Sans titre', excerpt: req.body.excerpt || '', content: req.body.content || '', status: req.body.status || 'draft', date: req.body.date || new Date().toISOString().split('T')[0], author: req.user.name || req.user.email, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+  const art  = { id: uid(), title: req.body.title || 'Sans titre', excerpt: req.body.excerpt || '', content: req.body.content || '', image: req.body.image || null, status: req.body.status || 'draft', date: req.body.date || new Date().toISOString().split('T')[0], author: req.user.name || req.user.email, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+  // Image jointe (base64)
+  if (req.body.filedata && req.body.filename) {
+    const { url } = saveFile(req.body.filedata, req.body.filename);
+    art.image = url;
+  }
   arts.push(art);
   write('articles.json', arts);
   res.status(201).json(art);
@@ -199,7 +216,14 @@ app.put('/api/articles/:id', requireAuth, (req, res) => {
   const arts = read('articles.json');
   const i = arts.findIndex(a => a.id === req.params.id);
   if (i === -1) return res.status(404).json({ error: 'Article non trouvé' });
-  arts[i] = { ...arts[i], ...req.body, id: req.params.id, updatedAt: new Date().toISOString() };
+  // Ne jamais persister le blob base64 sur l'article
+  const { filedata, filename, ...rest } = req.body;
+  arts[i] = { ...arts[i], ...rest, id: req.params.id, updatedAt: new Date().toISOString() };
+  // Nouvelle image uploadée
+  if (filedata && filename) {
+    const { url } = saveFile(filedata, filename);
+    arts[i].image = url;
+  }
   write('articles.json', arts);
   res.json(arts[i]);
 });
@@ -208,6 +232,60 @@ app.delete('/api/articles/:id', requireAuth, (req, res) => {
   let arts = read('articles.json');
   arts = arts.filter(a => a.id !== req.params.id);
   write('articles.json', arts);
+  res.json({ ok: true });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// IN THE MEDIA
+// ═══════════════════════════════════════════════════════════════════════════
+
+app.get('/api/media', optionalAuth, (req, res) => {
+  let media = read('media.json');
+  if (!req.user) media = media.filter(m => m.status === 'active');
+  res.json(media);
+});
+
+app.get('/api/media/:id', optionalAuth, (req, res) => {
+  const media = read('media.json');
+  const m = media.find(m => m.id === req.params.id);
+  if (!m || (!req.user && m.status !== 'active'))
+    return res.status(404).json({ error: 'Média non trouvé' });
+  res.json(m);
+});
+
+app.post('/api/media', requireAuth, (req, res) => {
+  const media = read('media.json');
+  const m = { id: uid(), title: req.body.title || 'Sans titre', source: req.body.source || '', url: req.body.url || '', image: req.body.image || '', status: req.body.status || 'active', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+  // Image jointe (base64)
+  if (req.body.filedata && req.body.filename) {
+    const { url } = saveFile(req.body.filedata, req.body.filename);
+    m.image = url;
+  }
+  media.push(m);
+  write('media.json', media);
+  res.status(201).json(m);
+});
+
+app.put('/api/media/:id', requireAuth, (req, res) => {
+  const media = read('media.json');
+  const i = media.findIndex(m => m.id === req.params.id);
+  if (i === -1) return res.status(404).json({ error: 'Média non trouvé' });
+  // Ne jamais persister le blob base64 sur le média
+  const { filedata, filename, ...rest } = req.body;
+  media[i] = { ...media[i], ...rest, id: req.params.id, updatedAt: new Date().toISOString() };
+  // Nouvelle image uploadée
+  if (filedata && filename) {
+    const { url } = saveFile(filedata, filename);
+    media[i].image = url;
+  }
+  write('media.json', media);
+  res.json(media[i]);
+});
+
+app.delete('/api/media/:id', requireAuth, (req, res) => {
+  let media = read('media.json');
+  media = media.filter(m => m.id !== req.params.id);
+  write('media.json', media);
   res.json({ ok: true });
 });
 

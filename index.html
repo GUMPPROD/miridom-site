@@ -675,51 +675,7 @@
         <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(4,120,87,0.88) 0%,rgba(6,78,59,0.92) 100%)"></div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px" id="media-grid">
-        <!-- Card 1 -->
-        <article class="article-card">
-          <img src="https://images.unsplash.com/photo-1573339584805-6ed85958b6e8?q=80&w=600&auto=format&fit=crop" alt="Pride" class="article-card-img" />
-          <div class="article-card-body">
-            <div class="article-card-cat">Interview</div>
-            <div class="article-card-title">DOMINICA: 'It's an ongoing journey to achieve full inclusion and acceptance of LGBTQI+ people'</div>
-            <div class="article-card-meta" style="margin-top:16px"><span class="article-card-date">OutRight Action International</span><a href="#" target="_blank" class="article-card-link">Read →</a></div>
-          </div>
-        </article>
-        <!-- Card 2 -->
-        <article class="article-card">
-          <img src="https://images.unsplash.com/photo-1596247851352-5b908d61c6fc?q=80&w=600&auto=format&fit=crop" alt="Court ruling" class="article-card-img" />
-          <div class="article-card-body">
-            <div class="article-card-cat">Press release</div>
-            <div class="article-card-title">MiRiDom celebrates and welcomes court ruling</div>
-            <div class="article-card-meta" style="margin-top:16px"><span class="article-card-date">MiRiDom</span><a href="#" target="_blank" class="article-card-link">Read →</a></div>
-          </div>
-        </article>
-        <!-- Card 3 -->
-        <article class="article-card">
-          <img src="https://images.unsplash.com/photo-1748810859309-b943147cdda2?q=80&w=600&auto=format&fit=crop" alt="Caribbean progress" class="article-card-img" />
-          <div class="article-card-body">
-            <div class="article-card-cat">Regional news</div>
-            <div class="article-card-title">Progress in the Caribbean as Dominica Decriminalizes Same-Sex Relations</div>
-            <div class="article-card-meta" style="margin-top:16px"><span class="article-card-date">ILGA World</span><a href="#" target="_blank" class="article-card-link">Read →</a></div>
-          </div>
-        </article>
-        <!-- Card 4 -->
-        <article class="article-card">
-          <img src="https://images.unsplash.com/photo-1575221165108-1c5d11ee1c51?q=80&w=600&auto=format&fit=crop" alt="Policy" class="article-card-img" />
-          <div class="article-card-body">
-            <div class="article-card-cat">Recommendations</div>
-            <div class="article-card-title">MiRiDom has released its recommendations to the Government of Dominica requesting Policy Change for equal rights for the LGBTQI Community and Electoral Reform</div>
-            <div class="article-card-meta" style="margin-top:16px"><span class="article-card-date">MiRiDom</span><a href="#" target="_blank" class="article-card-link">Read →</a></div>
-          </div>
-        </article>
-        <!-- Card 5 -->
-        <article class="article-card">
-          <img src="https://images.unsplash.com/photo-1550338649-0131b8cec2d7?q=80&w=600&auto=format&fit=crop" alt="High Court" class="article-card-img" />
-          <div class="article-card-body">
-            <div class="article-card-cat">Legal victory</div>
-            <div class="article-card-title">MiRiDom Welcomes High Court Ruling Declaring Buggery Laws in Dominica Unconstitutional</div>
-            <div class="article-card-meta" style="margin-top:16px"><span class="article-card-date">MiRiDom</span><a href="#" target="_blank" class="article-card-link">Read →</a></div>
-          </div>
-        </article>
+        <!-- Rendered dynamically from /api/media by loadMedia() -->
       </div>
     </div>
   </section>
@@ -1117,7 +1073,7 @@ const ARTICLE_IMGS = [
 ];
 
 function articleCardHTML(a, idx) {
-  const imgUrl = ARTICLE_IMGS[idx % ARTICLE_IMGS.length];
+  const imgUrl = a.image ? a.image : ARTICLE_IMGS[idx % ARTICLE_IMGS.length];
   return `
     <div class="article-card" onclick="showArticle('${a.id}')">
       <img src="${imgUrl}" alt="${esc(a.title)}" class="article-card-img"
@@ -1158,6 +1114,29 @@ function renderHomeArticles() {
   el.innerHTML = list.map((a, i) => articleCardHTML(a, i)).join('');
 }
 
+// ── In the Media ──────────────────────────────────────────────────
+const MEDIA_FALLBACK_IMG = 'https://images.unsplash.com/photo-1573339584805-6ed85958b6e8?q=80&w=600&auto=format&fit=crop';
+
+async function loadMedia() {
+  const el = document.getElementById('media-grid');
+  if (!el) return;
+  const items = await callApi('/api/media');
+  if (!items || !items.length) { el.innerHTML = ''; return; }
+  el.innerHTML = items.map(m => {
+    const imgUrl = m.image || MEDIA_FALLBACK_IMG;
+    const href = m.url && m.url !== '' ? m.url : '#';
+    return `
+      <article class="article-card">
+        <img src="${esc(imgUrl)}" alt="${esc(m.title)}" class="article-card-img" />
+        <div class="article-card-body">
+          <div class="article-card-cat">${esc(m.source)}</div>
+          <div class="article-card-title">${esc(m.title)}</div>
+          <div class="article-card-meta" style="margin-top:16px"><span class="article-card-date">${esc(m.source)}</span><a href="${esc(href)}" target="_blank" rel="noopener" class="article-card-link">Read →</a></div>
+        </div>
+      </article>`;
+  }).join('');
+}
+
 // ── Actualités page ───────────────────────────────────────────────
 async function loadActualitesPage() {
   if (!_articlesLoaded) {
@@ -1183,7 +1162,7 @@ async function showArticle(id) {
   const a = _allArticles.find(a => a.id === id);
   if (!a) return;
 
-  const imgUrl = ARTICLE_IMGS[_allArticles.indexOf(a) % ARTICLE_IMGS.length];
+  const imgUrl = a.image ? a.image : ARTICLE_IMGS[_allArticles.indexOf(a) % ARTICLE_IMGS.length];
   const el = document.getElementById('article-dynamic-content');
   if (el) {
     el.innerHTML = `
@@ -1383,6 +1362,7 @@ function openResource(el) {
 // ── Boot ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   await loadHomeArticles();
+  await loadMedia();
   await loadAboutPage();
 });
 </script>
