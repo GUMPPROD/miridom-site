@@ -556,12 +556,11 @@
 
   <!-- HERO -->
   <div class="hero">
-    <div class="hero-bg" id="hero-bg" style="background-image: url('/img_header.png')"></div>
+    <div class="hero-bg" id="hero-bg" style="background-image: url('/village-soufriere-voyage-la-dominique.jpg')"></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <h1 class="hero-h1" id="hero-title">Defending the rights<br>of <span class="highlight">everyone</span> in<br>Dominica</h1>
+      <h1 class="hero-h1" id="hero-title"><span class="highlight">Step Up</span> so others do not get stepped on</h1>
       <p class="hero-sub" id="hero-sub">MiRiDom advocates for the fundamental rights of the LGBTQ+ community in Dominica. Together, let's build a more just and inclusive society.</p>
-      <p class="hero-motto" style="font-size:clamp(16px,2vw,19px);font-weight:700;font-style:italic;color:#fff;margin:0 0 32px;padding-left:16px;border-left:3px solid #34D399;max-width:540px;line-height:1.45">"Step Up so others do not get stepped on"</p>
       <div class="hero-ctas">
         <button class="btn-primary-hero" onclick="showPage('apropos')">
           Discover our mission
@@ -922,7 +921,7 @@
             </div>
           </div>
           <div style="margin-top:56px">
-            <img src="https://images.unsplash.com/photo-1748810859309-b943147cdda2?q=80&w=600&auto=format&fit=crop"
+            <img src="/img_header.png"
               alt="Dominica" style="width:100%;border-radius:20px;height:220px;object-fit:cover;opacity:0.6" />
           </div>
         </div>
@@ -1330,7 +1329,7 @@ async function loadAboutPage() {
     if (about.vision)  document.getElementById('about-vision').textContent = about.vision;
   }
   if (home) {
-    if (home.heroTitle)    document.getElementById('hero-title').innerHTML = home.heroTitle.replace('tous', '<span class="highlight">tous</span>');
+    if (home.heroTitle)    document.getElementById('hero-title').innerHTML = home.heroTitle.replace('Step Up', '<span class="highlight">Step Up</span>');
     if (home.heroSubtitle) document.getElementById('hero-sub').textContent = home.heroSubtitle;
     if (home.missionText)  {
       const el = document.getElementById('home-mission-text');

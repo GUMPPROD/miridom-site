@@ -130,7 +130,7 @@ function initData() {
   if (!fs.existsSync(path.join(DATA, 'messages.json'))) write('messages.json', []);
   if (!fs.existsSync(path.join(DATA, 'pages.json'))) {
     write('pages.json', [
-      { slug: 'home', heroTitle: 'Defending the rights of everyone in Dominica', heroSubtitle: 'MiRiDom advocates for the fundamental rights of the LGBTQ+ community in Dominica.', missionText: 'Our mission is to promote, protect, and defend the fundamental rights of all people in Dominica.', updatedAt: new Date().toISOString() },
+      { slug: 'home', heroTitle: 'Step Up so others do not get stepped on', heroSubtitle: 'MiRiDom advocates for the fundamental rights of the LGBTQ+ community in Dominica.', missionText: 'Our mission is to promote, protect, and defend the fundamental rights of all people in Dominica.', updatedAt: new Date().toISOString() },
       { slug: 'about', content: 'MiRiDom (Minority Rights Dominica) is a civil society organization.', mission: 'To promote, protect, and defend the fundamental rights of all people in Dominica.', vision: 'A Dominica where every person lives freely, with dignity and in safety.', updatedAt: new Date().toISOString() },
       { slug: 'legal', content: 'MiRiDom is a non-profit organization.', updatedAt: new Date().toISOString() }
     ]);
