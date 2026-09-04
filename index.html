@@ -109,7 +109,7 @@
     .hero-tag::before { content: ''; width: 6px; height: 6px; background: #059669; border-radius: 50%; }
     .hero-h1 {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: clamp(52px, 7vw, 88px);
+      font-size: clamp(26px, 3.5vw, 44px);
       font-weight: 800; line-height: 1.0;
       color: white; letter-spacing: -2px;
       margin-bottom: 24px;
@@ -371,7 +371,7 @@
       #main-nav { padding: 16px 20px; }
       #main-nav.scrolled { padding: 12px 20px; }
       .hero-content { padding: 0 24px 60px; }
-      .hero-h1 { font-size: 40px; word-break: break-word; overflow-wrap: anywhere; }
+      .hero-h1 { font-size: 22px; word-break: break-word; overflow-wrap: anywhere; }
       .section { padding: 60px 24px; }
       .hero-scroll { right: 24px; }
       .page-header { padding: 120px 24px 40px; }
@@ -461,7 +461,7 @@
       /* ── 2. Hero (home) ── */
       .hero { min-height: 560px !important; }
       .hero-content { padding: 0 22px 52px !important; max-width: 100% !important; }
-      .hero-h1 { font-size: 38px !important; letter-spacing: -1px !important; line-height: 1.08 !important; margin-bottom: 18px !important; }
+      .hero-h1 { font-size: 22px !important; letter-spacing: -0.5px !important; line-height: 1.15 !important; margin-bottom: 16px !important; }
       .hero-sub { font-size: 15px !important; line-height: 1.6 !important; margin-bottom: 26px !important; max-width: 100% !important; }
       .hero-ctas { flex-direction: column; align-items: stretch; width: 100%; gap: 10px; }
       .hero-ctas > button { width: 100%; justify-content: center; }
@@ -520,6 +520,53 @@
       .res-item { flex-wrap: wrap !important; padding: 16px !important; row-gap: 12px !important; }
       .res-item > *:last-child { flex: 1 0 100% !important; justify-content: center !important; }
     }
+
+    /* ══ Recherche + tags (ajout) ══ */
+    .tools-bar { display:flex; flex-direction:column; gap:14px; margin-bottom:28px; }
+    .search-box { display:flex; align-items:center; gap:10px; padding:12px 16px; border-radius:12px; width:100%; max-width:420px; box-sizing:border-box; }
+    .search-box svg { flex-shrink:0; }
+    .search-box input { flex:1; min-width:0; border:none; outline:none; background:transparent; font-family:inherit; font-size:15px; }
+    .search-light { background:#F3F4F6; border:1px solid #E5E7EB; }
+    .search-light input { color:#111827; }
+    .search-light input::placeholder { color:#9CA3AF; }
+    .search-dark { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.10); }
+    .search-dark input { color:#fff; }
+    .search-dark input::placeholder { color:rgba(255,255,255,0.35); }
+    .tag-bar { display:flex; flex-wrap:wrap; gap:8px; }
+    .tag-chip { font-family:inherit; font-size:12px; font-weight:600; padding:8px 14px; border-radius:999px; cursor:pointer; transition:all .2s; min-height:36px; }
+    .tools-light .tag-chip { background:#fff; border:1px solid #E5E7EB; color:#4B5563; }
+    .tools-light .tag-chip:hover { border-color:#059669; color:#059669; }
+    .tools-light .tag-chip.active { background:#059669; border-color:#059669; color:#fff; }
+    .tools-dark .tag-chip { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.10); color:rgba(255,255,255,0.65); }
+    .tools-dark .tag-chip:hover { border-color:rgba(52,211,153,0.5); color:#34D399; }
+    .tools-dark .tag-chip.active { background:#059669; border-color:#059669; color:#fff; }
+    .card-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+    .tag-pill { font-size:11px; font-weight:700; letter-spacing:.3px; padding:4px 10px; border-radius:999px; }
+    .tag-pill-light { background:#ECFDF5; color:#047857; }
+    .tag-pill-dark { background:rgba(5,150,105,0.18); color:#6EE7B7; }
+    .sec-pad { padding:60px; }
+
+    /* ══ Tablette ══ */
+    @media (max-width: 1024px) and (min-width: 769px) {
+      #main-nav { padding:18px 28px; }
+      #home-articles-list, #media-grid, #actualites-list { grid-template-columns:repeat(2,1fr) !important; }
+      .nav-logo { height:62px !important; }
+      .btn-nav-cta { display:none; }              /* on laisse la place au logo */
+      .nav-links { gap:8px !important; }
+      .nav-link { font-size:13px !important; padding:6px 8px !important; }
+      .sec-pad { padding:48px 32px; }
+    }
+
+    /* ══ Mobile (compléments) ══ */
+    @media (max-width: 768px) {
+      /* le logo occupe toute la largeur dispo, en gardant la place du bouton menu */
+      .nav-logo { width: min(324px, calc(100vw - 100px)) !important; height: auto !important; }
+      .footer-logo { height:52px !important; }
+      .sec-pad { padding:40px 20px; }
+      .search-box { max-width:none; }
+      .tag-chip { font-size:13px; padding:9px 15px; }
+      .card-tags { margin-top:8px; }
+    }
   </style>
 </head>
 <body style="background: #0A0F0D; overflow-x: hidden;">
@@ -527,8 +574,8 @@
 <!-- ══════════════════════════════════════════ NAV ══ -->
 <nav id="main-nav">
   <div onclick="showPage('accueil')" style="cursor:pointer;display:flex;align-items:center">
-    <img src="/logo-officiel.png" alt="MiRiDom — Minority Rights Dominica"
-      style="height:40px;width:auto"
+    <img src="/logo-officiel.png" alt="MiRiDom — Minority Rights Dominica" class="nav-logo"
+      style="height:96px;width:auto"
       onerror="this.outerHTML='<div style=\'display:flex;align-items:center;gap:10px;cursor:pointer\' onclick=\'showPage(\'accueil\')\'>'+
         '<div style=\'width:36px;height:36px;background:linear-gradient(135deg,#059669,#047857);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;color:white;font-size:12px\'>MD</div>'+
         '<div><div style=\'font-weight:800;font-size:16px;color:white\'>MiRiDom</div><div style=\'font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:0.5px\'>Minority Rights Dominica</div></div></div>'" />
@@ -815,8 +862,15 @@
       <p class="page-header-sub">Articles, press releases, and news from MiRiDom.</p>
     </div>
   </div>
-  <section style="background:white;padding:60px">
+  <section class="sec-pad" style="background:white">
     <div style="max-width:1100px;margin:0 auto">
+      <div class="tools-bar tools-light">
+        <div class="search-box search-light">
+          <svg width="17" height="17" fill="none" stroke="#9CA3AF" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="M20 20l-3.5-3.5"/></svg>
+          <input type="search" id="actu-search" placeholder="Search news…" aria-label="Search news" oninput="onActuSearch(this.value)" />
+        </div>
+        <div class="tag-bar" id="actu-tagbar"></div>
+      </div>
       <div id="actualites-list" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
         <div style="color:#9CA3AF;text-align:center;padding:60px;grid-column:1/-1">Loading articles…</div>
       </div>
@@ -837,8 +891,15 @@
     <p class="page-header-sub">Downloadable documents and useful links for the community.</p>
   </div>
 
-  <section style="background:var(--dark-2);padding:60px">
+  <section class="sec-pad" style="background:var(--dark-2)">
     <div style="max-width:860px;margin:0 auto">
+      <div class="tools-bar tools-dark">
+        <div class="search-box search-dark">
+          <svg width="17" height="17" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="M20 20l-3.5-3.5"/></svg>
+          <input type="search" id="res-search" placeholder="Search resources…" aria-label="Search resources" oninput="onResSearch(this.value)" />
+        </div>
+        <div class="tag-bar" id="res-tagbar"></div>
+      </div>
       <div id="ressources-dynamic-list">
         <div style="color:rgba(255,255,255,0.3);text-align:center;padding:60px">Loading…</div>
       </div>
@@ -984,7 +1045,7 @@
     <div class="m-collapse" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px">
       <div>
         <div style="margin-bottom:16px">
-          <img src="/logo-officiel.png" alt="MiRiDom" style="height:36px;width:auto"
+          <img src="/logo-officiel.png" alt="MiRiDom" class="footer-logo" style="height:78px;width:auto"
             onerror="this.outerHTML='<div style=\'font-weight:800;font-size:16px;color:white\'>MiRiDom</div>'" />
         </div>
         <p style="font-size:14px;color:rgba(255,255,255,0.35);line-height:1.7;max-width:280px">Human rights advocacy organization for the LGBTQ+ community in Dominica.</p>
@@ -1082,6 +1143,7 @@ function articleCardHTML(a, idx) {
       <div class="article-card-body">
         <div class="article-card-title">${esc(a.title)}</div>
         <div class="article-card-excerpt">${esc((a.excerpt||'').substring(0,110))}…</div>
+        ${tagsHTML(a, 'light')}
         <div class="article-card-meta">
           <span class="article-card-date">${a.date}</span>
           <button class="article-card-link" onclick="event.stopPropagation();showArticle('${a.id}')">
@@ -1091,6 +1153,62 @@ function articleCardHTML(a, idx) {
       </div>
     </div>`;
 }
+
+// ── Tags + recherche (ajout) ──────────────────────────────────────
+let _actuQuery = '', _actuTag = '', _resQuery = '', _resTag = '';
+
+function escA(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function itemTags(o) {
+  if (Array.isArray(o.tags)) return o.tags.filter(Boolean);
+  if (typeof o.tags === 'string' && o.tags.trim()) return o.tags.split(',').map(t => t.trim()).filter(Boolean);
+  return [];
+}
+
+function tagsHTML(o, theme) {
+  const t = itemTags(o);
+  if (!t.length) return '';
+  const cls = theme === 'dark' ? 'tag-pill tag-pill-dark' : 'tag-pill tag-pill-light';
+  return '<div class="card-tags">' + t.map(x => '<span class="' + cls + '">' + esc(x) + '</span>').join('') + '</div>';
+}
+
+function filterItems(list, q, tag) {
+  const query = (q || '').trim().toLowerCase();
+  return list.filter(o => {
+    if (tag && !itemTags(o).some(t => t.toLowerCase() === tag.toLowerCase())) return false;
+    if (!query) return true;
+    const hay = [o.title, o.excerpt, o.description, o.content, o.originalFilename, itemTags(o).join(' ')]
+      .filter(Boolean).join(' ').replace(/<[^>]*>/g, ' ').toLowerCase();
+    return hay.indexOf(query) !== -1;
+  });
+}
+
+function collectTags(list) {
+  const seen = new Map();
+  list.forEach(o => itemTags(o).forEach(t => { if (!seen.has(t.toLowerCase())) seen.set(t.toLowerCase(), t); }));
+  return [...seen.values()].sort((a, b) => a.localeCompare(b));
+}
+
+function renderTagBar(elId, list, current, setter) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const tags = collectTags(list);
+  if (!tags.length) { el.innerHTML = ''; return; }
+  el.innerHTML =
+    '<button type="button" class="tag-chip' + (current ? '' : ' active') + '" data-t="" onclick="' + setter + '(this.dataset.t)">All</button>' +
+    tags.map(t => '<button type="button" class="tag-chip' + (current && current.toLowerCase() === t.toLowerCase() ? ' active' : '') +
+      '" data-t="' + escA(t) + '" onclick="' + setter + '(this.dataset.t)">' + esc(t) + '</button>').join('');
+}
+
+function setActuTag(t) { _actuTag = (_actuTag === t ? '' : t); applyActuFilters(); }
+function onActuSearch(v) { _actuQuery = v; applyActuFilters(); }
+function applyActuFilters() {
+  renderTagBar('actu-tagbar', _allArticles, _actuTag, 'setActuTag');
+  renderActualites(filterItems(_allArticles, _actuQuery, _actuTag));
+}
+
+function setResTag(t) { _resTag = (_resTag === t ? '' : t); renderRessources(); }
+function onResSearch(v) { _resQuery = v; renderRessources(); }
 
 // ── Home articles ─────────────────────────────────────────────────
 let _allArticles = [];
@@ -1143,14 +1261,15 @@ async function loadActualitesPage() {
     const arts = await callApi('/api/articles');
     if (arts) { _allArticles = arts; _articlesLoaded = true; }
   }
-  renderActualites(_allArticles);
+  applyActuFilters();
 }
 
 function renderActualites(list) {
   const el = document.getElementById('actualites-list');
   if (!el) return;
   if (!list.length) {
-    el.innerHTML = '<div style="color:#9CA3AF;text-align:center;padding:80px;grid-column:1/-1">No articles yet.</div>';
+    const msg = (_actuQuery || _actuTag) ? 'No article matches your search.' : 'No articles yet.';
+    el.innerHTML = '<div style="color:#9CA3AF;text-align:center;padding:80px;grid-column:1/-1">' + msg + '</div>';
     return;
   }
   el.innerHTML = list.map((a, i) => articleCardHTML(a, i)).join('');
@@ -1209,11 +1328,14 @@ function renderRessources() {
   const el = document.getElementById('ressources-dynamic-list');
   if (!el) return;
 
-  const docs  = _resources.filter(r => r.filename); // fichiers téléchargeables
-  const liens = _resources.filter(r => !r.filename); // liens externes
+  renderTagBar('res-tagbar', _resources, _resTag, 'setResTag');
+  const _shown = filterItems(_resources, _resQuery, _resTag);
+  const docs  = _shown.filter(r => r.filename); // fichiers téléchargeables
+  const liens = _shown.filter(r => !r.filename); // liens externes
 
   if (!docs.length && !liens.length) {
-    el.innerHTML = '<div style="color:rgba(255,255,255,0.3);text-align:center;padding:80px 0">No resources available yet.</div>';
+    const msg = (_resQuery || _resTag) ? 'No resource matches your search.' : 'No resources available yet.';
+    el.innerHTML = '<div style="color:rgba(255,255,255,0.3);text-align:center;padding:80px 0">' + msg + '</div>';
     return;
   }
 
@@ -1241,6 +1363,7 @@ function renderRessources() {
               <div style="font-weight:700;font-size:15px;color:white;line-height:1.3">${esc(r.title)}</div>
               ${r.description ? `<div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:3px">${esc(r.description)}</div>` : ''}
               ${r.originalFilename ? `<div style="font-size:11px;color:rgba(255,255,255,0.22);margin-top:4px">${esc(r.originalFilename)}${r.fileSize ? ' · ' + fmtSize(r.fileSize) : ''}</div>` : ''}
+              ${tagsHTML(r, 'dark')}
             </div>
             <div style="flex-shrink:0;display:inline-flex;align-items:center;gap:6px;${url?'background:#059669':'background:rgba(255,255,255,0.08)'};color:white;font-size:12px;font-weight:700;padding:9px 18px;border-radius:10px;white-space:nowrap">
               ${url
@@ -1276,6 +1399,7 @@ function renderRessources() {
               <div style="font-weight:700;font-size:15px;color:white;line-height:1.3">${esc(r.title)}</div>
               ${r.description ? `<div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:3px">${esc(r.description)}</div>` : ''}
               ${url ? `<div style="font-size:11px;color:rgba(255,255,255,0.22);margin-top:4px">${url}</div>` : ''}
+              ${tagsHTML(r, 'dark')}
             </div>
             <div style="flex-shrink:0;display:inline-flex;align-items:center;gap:6px;${url?'background:#059669':'background:rgba(255,255,255,0.08)'};color:white;font-size:12px;font-weight:700;padding:9px 18px;border-radius:10px;white-space:nowrap">
               ${url ? 'Open →' : '<span style="color:rgba(255,255,255,0.3)">—</span>'}

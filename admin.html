@@ -99,6 +99,14 @@
       /* Section headers stack nicely */
       section .flex.items-center.justify-between { flex-wrap:wrap; gap:12px; }
     }
+    /* ── Tags ── */
+    .tagbox { display:flex;flex-wrap:wrap;gap:6px;min-height:38px;align-items:center;padding:8px;border:1.5px solid #E5E7EB;border-radius:10px;background:#F9FAFB; }
+    .tagchip { display:inline-flex;align-items:center;gap:6px;background:#059669;color:#fff;font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px; }
+    .tagchip-x { background:none;border:none;color:rgba(255,255,255,.8);cursor:pointer;font-size:14px;line-height:1;padding:0 0 0 2px; }
+    .tagchip-x:hover { color:#fff; }
+    .tagsug { background:#fff;border:1px solid #E5E7EB;color:#4B5563;font-size:12px;font-weight:600;padding:6px 11px;border-radius:999px;cursor:pointer;margin:0 6px 6px 0; }
+    .tagsug:hover { border-color:#059669;color:#059669; }
+    .tag-mini { display:inline-block;background:#ECFDF5;color:#047857;font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;margin-right:4px; }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -348,6 +356,14 @@
       </div>
       <div><label class="form-label">Date</label><input id="actu-date" type="date" class="form-input" /></div>
       <div><label class="form-label">Excerpt *</label><textarea id="actu-excerpt" rows="3" class="form-input resize-none"></textarea></div>
+      <div><label class="form-label">Tags</label>
+        <div id="actu-tags-box" class="tagbox"></div>
+        <div class="flex gap-2 mt-2">
+          <input id="actu-tag-input" type="text" class="form-input" placeholder="Type a tag, then Enter or Add…" onkeydown="tagInputKey(event,'actu')" onblur="flushTagInput('actu')" />
+          <button type="button" class="btn-green whitespace-nowrap" onclick="flushTagInput('actu')">+ Add</button>
+        </div>
+        <div id="actu-tag-suggest"></div>
+      </div>
       <div><label class="form-label">Full content (optional)</label>
         <div class="border border-gray-200 rounded-xl overflow-hidden">
           <div class="bg-gray-50 border-b border-gray-200 px-3 py-2 flex gap-1">
@@ -420,6 +436,14 @@
     <div class="space-y-4">
       <div><label class="form-label">Title *</label><input id="res-title" type="text" class="form-input" /></div>
       <div><label class="form-label">Description</label><textarea id="res-description" rows="2" class="form-input resize-none"></textarea></div>
+      <div><label class="form-label">Tags</label>
+        <div id="res-tags-box" class="tagbox"></div>
+        <div class="flex gap-2 mt-2">
+          <input id="res-tag-input" type="text" class="form-input" placeholder="Type a tag, then Enter or Add…" onkeydown="tagInputKey(event,'res')" onblur="flushTagInput('res')" />
+          <button type="button" class="btn-green whitespace-nowrap" onclick="flushTagInput('res')">+ Add</button>
+        </div>
+        <div id="res-tag-suggest"></div>
+      </div>
 
       <!-- Type: Link or File -->
       <div>
@@ -523,7 +547,7 @@ function initApp(user) {
   document.getElementById('userName').textContent    = user.name || 'Admin';
   document.getElementById('userEmail').textContent   = user.email;
   document.getElementById('userInitial').textContent = (user.name || 'A')[0].toUpperCase();
-  loadDashboard(); loadActualites(); loadMedia(); loadResources(); loadMessages(); loadPages();
+  loadTags(); loadDashboard(); loadActualites(); loadMedia(); loadResources(); loadMessages(); loadPages();
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────
@@ -629,7 +653,7 @@ function renderActus() {
   const el = document.getElementById('actualites-list');
   if (!_actus.length) { el.innerHTML = '<div class="p-12 text-center text-gray-400"><p class="mb-3">No articles</p><button onclick="openActuModal(null)" class="btn-green">Create the first one</button></div>'; return; }
   el.innerHTML = makeTable(['Title','Date','Status'], _actus.map(a =>
-    '<tr><td class="font-medium text-gray-900 max-w-xs"><div class="truncate">' + esc(a.title) + '</div><div class="text-xs text-gray-400 truncate">' + esc(a.excerpt||'').substring(0,70) + '</div></td>' +
+    '<tr><td class="font-medium text-gray-900 max-w-xs"><div class="truncate">' + esc(a.title) + '</div><div class="text-xs text-gray-400 truncate">' + esc(a.excerpt||'').substring(0,70) + '</div>' + tagsMini(a) + '</td>' +
     '<td class="text-gray-500 text-sm">' + a.date + '</td>' +
     '<td><span class="' + (a.status==='published'?'badge-green':'badge-yellow') + '">' + (a.status==='published'?'Published':'Draft') + '</span></td>' +
     '<td><div class="flex gap-2 justify-end">' +
@@ -644,6 +668,8 @@ function openActuModal(a) {
   sv('actu-id', a?.id||''); sv('actu-title', a?.title||'');
   sv('actu-status', a?.status||'draft'); sv('actu-date', a?.date||today()); sv('actu-excerpt', a?.excerpt||'');
   document.getElementById('actu-content').innerHTML = a?.content||'';
+  _actuTags = Array.isArray(a?.tags) ? a.tags.slice() : [];
+  sv2('actu-tag-input',''); renderTagEditor('actu');
   _pendingActuImage = null;
   document.getElementById('actu-image-label').textContent = 'Click to select an image';
   document.getElementById('actu-image-zone').className = 'upload-zone';
@@ -671,8 +697,9 @@ function handleActuImageSelect(event) {
 }
 
 async function saveActu() {
+  flushTagInput('actu');
   const id = v('actu-id');
-  const body = { title:v('actu-title'), status:v('actu-status'), date:v('actu-date'), excerpt:v('actu-excerpt'), content:document.getElementById('actu-content').innerHTML };
+  const body = { title:v('actu-title'), status:v('actu-status'), date:v('actu-date'), excerpt:v('actu-excerpt'), content:document.getElementById('actu-content').innerHTML, tags:_actuTags.slice() };
   if (!body.title) { toast('Title required','red'); return; }
   if (_pendingActuImage) Object.assign(body, _pendingActuImage);
   try { if(id) await apiFetch('PUT','/api/articles/'+id,body); else await apiFetch('POST','/api/articles',body); document.getElementById('actuModal').style.display='none'; toast('Saved ✓'); loadActualites(); loadDashboard(); } catch(e) { toast(e.message,'red'); }
@@ -780,7 +807,7 @@ function renderResources() {
           ? `<a href="${r.url}" target="_blank" class="text-blue-600 text-xs font-medium hover:underline">↗ Open</a>`
           : '<span class="text-gray-300 text-xs">—</span>');
     return '<tr>' +
-      '<td class="font-medium text-gray-900 max-w-xs"><div class="truncate">' + esc(r.title) + '</div><div class="text-xs text-gray-400 truncate">' + esc(r.description||'') + '</div></td>' +
+      '<td class="font-medium text-gray-900 max-w-xs"><div class="truncate">' + esc(r.title) + '</div><div class="text-xs text-gray-400 truncate">' + esc(r.description||'') + '</div>' + tagsMini(r) + '</td>' +
       '<td>' + badge + '</td>' +
       '<td>' + access + '</td>' +
       '<td><span class="' + (r.status==='active'?'badge-green':'badge-yellow') + '">' + (r.status==='active'?'Active':'Inactive') + '</span></td>' +
@@ -792,6 +819,8 @@ function openResourceModal(r) {
   document.getElementById('res-modal-title').textContent = r ? 'Edit resource' : 'New resource';
   sv('res-id', r?.id||''); sv('res-title', r?.title||''); sv('res-description', r?.description||'');
   sv('res-url', r?.url||''); sv('res-status', r?.status||'active');
+  _resTags = Array.isArray(r?.tags) ? r.tags.slice() : [];
+  sv2('res-tag-input',''); renderTagEditor('res');
   _pendingFile = null;
   document.getElementById('res-upload-label').textContent = 'Click to select a file';
   document.getElementById('res-upload-zone').className = 'upload-zone';
@@ -836,13 +865,15 @@ function handleResFileSelect(event) {
 }
 
 async function saveResource() {
+  flushTagInput('res');
   const id   = v('res-id');
   const type = document.querySelector('input[name="res-type-radio"]:checked')?.value || 'lien';
   const body = {
     title:       v('res-title'),
     description: v('res-description'),
     status:      v('res-status'),
-    type:        type
+    type:        type,
+    tags:        _resTags.slice()
   };
   if (!body.title) { toast('Title required','red'); return; }
 
@@ -860,6 +891,82 @@ async function saveResource() {
     toast('Resource saved ✓');
     loadResources(); loadDashboard();
   } catch(e) { toast(e.message,'red'); }
+}
+
+// ── TAGS ─────────────────────────────────────────────────────────────────
+let _allTags = [], _actuTags = [], _resTags = [];
+
+async function loadTags() {
+  try { const t = await apiFetch('GET', '/api/tags'); _allTags = Array.isArray(t) ? t : []; }
+  catch (e) { _allTags = []; }
+  renderTagEditor('actu'); renderTagEditor('res');
+}
+
+function selTags(ns) { return ns === 'actu' ? _actuTags : _resTags; }
+
+function renderTagEditor(ns) {
+  const sel = selTags(ns);
+  const box = document.getElementById(ns + '-tags-box');
+  if (box) {
+    box.innerHTML = sel.length
+      ? sel.map((t, i) => '<span class="tagchip">' + esc(t) + '<button type="button" class="tagchip-x" onclick="removeTag(\'' + ns + '\',' + i + ')">&times;</button></span>').join('')
+      : '<span class="text-xs text-gray-400 px-1">No tag yet</span>';
+  }
+  const sug = document.getElementById(ns + '-tag-suggest');
+  if (sug) {
+    const avail = _allTags.filter(t => !sel.some(x => x.toLowerCase() === t.toLowerCase()));
+    sug.dataset.avail = JSON.stringify(avail);
+    sug.innerHTML = avail.length
+      ? '<div class="text-xs text-gray-400 mt-2 mb-1">Existing tags — click to add</div>' +
+        avail.map((t, i) => '<button type="button" class="tagsug" onclick="addTagFromList(\'' + ns + '\',' + i + ')">+ ' + esc(t) + '</button>').join('')
+      : '';
+  }
+}
+
+function addTagFromList(ns, i) {
+  const sug = document.getElementById(ns + '-tag-suggest');
+  let avail = [];
+  try { avail = JSON.parse(sug.dataset.avail || '[]'); } catch (e) {}
+  addTag(ns, avail[i]);
+}
+
+function addTag(ns, name) {
+  name = String(name || '').trim();
+  if (!name) return;
+  const sel = selTags(ns);
+  if (sel.some(t => t.toLowerCase() === name.toLowerCase())) return;
+  sel.push(name);
+  if (!_allTags.some(t => t.toLowerCase() === name.toLowerCase())) {
+    _allTags.push(name);
+    _allTags.sort((a, b) => a.localeCompare(b));
+    apiFetch('POST', '/api/tags', { name }).catch(() => {});
+  }
+  renderTagEditor(ns);
+}
+
+function removeTag(ns, i) { selTags(ns).splice(i, 1); renderTagEditor(ns); }
+
+// Valide le texte encore present dans le champ (Entree oubliee, clic direct sur Save, perte de focus)
+function flushTagInput(ns) {
+  const el = document.getElementById(ns + '-tag-input');
+  if (!el) return;
+  const raw = el.value;
+  if (!raw || !raw.trim()) return;
+  raw.split(',').forEach(part => addTag(ns, part));
+  el.value = '';
+}
+
+function tagInputKey(e, ns) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    addTag(ns, e.target.value);
+    e.target.value = '';
+  }
+}
+
+function tagsMini(o) {
+  const t = Array.isArray(o?.tags) ? o.tags : [];
+  return t.length ? '<div class="mt-1">' + t.map(x => '<span class="tag-mini">' + esc(x) + '</span>').join('') + '</div>' : '';
 }
 
 // ── MESSAGES ─────────────────────────────────────────────────────────────

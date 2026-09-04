@@ -56,6 +56,22 @@ function write(file, data) {
 
 function uid() { return crypto.randomUUID(); }
 
+// Normalise une liste de tags (array ou chaine "a, b") -> array unique et propre
+function normTags(t) {
+  if (!t) return [];
+  if (typeof t === 'string') t = t.split(',');
+  if (!Array.isArray(t)) return [];
+  const out = [], seen = new Set();
+  for (const raw of t) {
+    const v = String(raw).trim();
+    if (!v) continue;
+    const k = v.toLowerCase();
+    if (seen.has(k)) continue;
+    seen.add(k); out.push(v);
+  }
+  return out;
+}
+
 // Sauvegarde un fichier base64, retourne { savedName, size, url }
 function saveFile(base64data, originalFilename) {
   if (!fs.existsSync(UPLOADS)) fs.mkdirSync(UPLOADS, { recursive: true });
@@ -75,9 +91,9 @@ function deleteFile(filename) {
 // ── Auth middleware ────────────────────────────────────────────────────────
 function requireAuth(req, res, next) {
   const h = req.headers.authorization;
-  if (!h?.startsWith('Bearer ')) return res.status(401).json({ error: 'Token requis' });
+  if (!h?.startsWith('Bearer ')) return res.status(401).json({ error: 'Token required' });
   try { req.user = jwt.verify(h.slice(7), JWT_SECRET); next(); }
-  catch { res.status(401).json({ error: 'Token invalide ou expiré' }); }
+  catch { res.status(401).json({ error: 'Invalid or expired token' }); }
 }
 
 function optionalAuth(req, res, next) {
@@ -155,11 +171,11 @@ function initData() {
 
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'Champs requis' });
+  if (!email || !password) return res.status(400).json({ error: 'Required fields missing' });
   const users = read('users.json');
   const user  = users.find(u => u.email === email.toLowerCase().trim());
   if (!user || !(await bcrypt.compare(password, user.password)))
-    return res.status(401).json({ error: 'Identifiants incorrects' });
+    return res.status(401).json({ error: 'Incorrect credentials' });
   const token = jwt.sign({ id: user.id, email: user.email, name: user.name, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
   res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
 });
@@ -168,13 +184,13 @@ app.get('/api/auth/me', requireAuth, (req, res) => res.json(req.user));
 
 app.post('/api/auth/change-password', requireAuth, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
-  if (!currentPassword || !newPassword) return res.status(400).json({ error: 'Champs requis' });
+  if (!currentPassword || !newPassword) return res.status(400).json({ error: 'Required fields missing' });
   if (newPassword.length < 6) return res.status(400).json({ error: 'Mot de passe trop court (min 6 car.)' });
   const users = read('users.json');
   const i = users.findIndex(u => u.id === req.user.id);
-  if (i === -1) return res.status(404).json({ error: 'Utilisateur non trouvé' });
+  if (i === -1) return res.status(404).json({ error: 'User not found' });
   if (!(await bcrypt.compare(currentPassword, users[i].password)))
-    return res.status(401).json({ error: 'Mot de passe actuel incorrect' });
+    return res.status(401).json({ error: 'Current password is incorrect' });
   users[i].password = bcrypt.hashSync(newPassword, 10);
   write('users.json', users);
   res.json({ ok: true });
@@ -195,13 +211,13 @@ app.get('/api/articles/:id', optionalAuth, (req, res) => {
   const arts = read('articles.json');
   const art  = arts.find(a => a.id === req.params.id);
   if (!art || (!req.user && art.status !== 'published'))
-    return res.status(404).json({ error: 'Article non trouvé' });
+    return res.status(404).json({ error: 'Article not found' });
   res.json(art);
 });
 
 app.post('/api/articles', requireAuth, (req, res) => {
   const arts = read('articles.json');
-  const art  = { id: uid(), title: req.body.title || 'Sans titre', excerpt: req.body.excerpt || '', content: req.body.content || '', image: req.body.image || null, status: req.body.status || 'draft', date: req.body.date || new Date().toISOString().split('T')[0], author: req.user.name || req.user.email, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+  const art  = { id: uid(), title: req.body.title || 'Untitled', excerpt: req.body.excerpt || '', content: req.body.content || '', image: req.body.image || null, tags: normTags(req.body.tags), status: req.body.status || 'draft', date: req.body.date || new Date().toISOString().split('T')[0], author: req.user.name || req.user.email, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
   // Image jointe (base64)
   if (req.body.filedata && req.body.filename) {
     const { url } = saveFile(req.body.filedata, req.body.filename);
@@ -215,10 +231,11 @@ app.post('/api/articles', requireAuth, (req, res) => {
 app.put('/api/articles/:id', requireAuth, (req, res) => {
   const arts = read('articles.json');
   const i = arts.findIndex(a => a.id === req.params.id);
-  if (i === -1) return res.status(404).json({ error: 'Article non trouvé' });
+  if (i === -1) return res.status(404).json({ error: 'Article not found' });
   // Ne jamais persister le blob base64 sur l'article
   const { filedata, filename, ...rest } = req.body;
   arts[i] = { ...arts[i], ...rest, id: req.params.id, updatedAt: new Date().toISOString() };
+  if (req.body.tags !== undefined) arts[i].tags = normTags(req.body.tags);
   // Nouvelle image uploadée
   if (filedata && filename) {
     const { url } = saveFile(filedata, filename);
@@ -236,6 +253,49 @@ app.delete('/api/articles/:id', requireAuth, (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
+// TAGS
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Liste : tags enregistres + tags reellement utilises par les contenus
+function allTags() {
+  const stored = read('tags.json');
+  const used   = [].concat(
+    ...read('articles.json').map(a => normTags(a.tags)),
+    ...read('resources.json').map(r => normTags(r.tags))
+  );
+  return normTags([].concat(Array.isArray(stored) ? stored : [], used))
+    .sort((a, b) => a.localeCompare(b));
+}
+
+app.get('/api/tags', (req, res) => res.json(allTags()));
+
+app.post('/api/tags', requireAuth, (req, res) => {
+  const name = String(req.body.name || '').trim();
+  if (!name) return res.status(400).json({ error: 'Tag name required' });
+  const stored = read('tags.json');
+  const list = Array.isArray(stored) ? stored : [];
+  if (!list.some(t => String(t).toLowerCase() === name.toLowerCase())) {
+    list.push(name);
+    write('tags.json', normTags(list));
+  }
+  res.status(201).json(allTags());
+});
+
+app.delete('/api/tags/:name', requireAuth, (req, res) => {
+  const name = decodeURIComponent(req.params.name).toLowerCase();
+  const stored = read('tags.json');
+  write('tags.json', (Array.isArray(stored) ? stored : []).filter(t => String(t).toLowerCase() !== name));
+  // retire aussi le tag des contenus
+  const arts = read('articles.json');
+  arts.forEach(a => { a.tags = normTags(a.tags).filter(t => t.toLowerCase() !== name); });
+  write('articles.json', arts);
+  const resources = read('resources.json');
+  resources.forEach(r => { r.tags = normTags(r.tags).filter(t => t.toLowerCase() !== name); });
+  write('resources.json', resources);
+  res.json(allTags());
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
 // IN THE MEDIA
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -249,13 +309,13 @@ app.get('/api/media/:id', optionalAuth, (req, res) => {
   const media = read('media.json');
   const m = media.find(m => m.id === req.params.id);
   if (!m || (!req.user && m.status !== 'active'))
-    return res.status(404).json({ error: 'Média non trouvé' });
+    return res.status(404).json({ error: 'Media item not found' });
   res.json(m);
 });
 
 app.post('/api/media', requireAuth, (req, res) => {
   const media = read('media.json');
-  const m = { id: uid(), title: req.body.title || 'Sans titre', source: req.body.source || '', url: req.body.url || '', image: req.body.image || '', status: req.body.status || 'active', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+  const m = { id: uid(), title: req.body.title || 'Untitled', source: req.body.source || '', url: req.body.url || '', image: req.body.image || '', status: req.body.status || 'active', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
   // Image jointe (base64)
   if (req.body.filedata && req.body.filename) {
     const { url } = saveFile(req.body.filedata, req.body.filename);
@@ -269,7 +329,7 @@ app.post('/api/media', requireAuth, (req, res) => {
 app.put('/api/media/:id', requireAuth, (req, res) => {
   const media = read('media.json');
   const i = media.findIndex(m => m.id === req.params.id);
-  if (i === -1) return res.status(404).json({ error: 'Média non trouvé' });
+  if (i === -1) return res.status(404).json({ error: 'Media item not found' });
   // Ne jamais persister le blob base64 sur le média
   const { filedata, filename, ...rest } = req.body;
   media[i] = { ...media[i], ...rest, id: req.params.id, updatedAt: new Date().toISOString() };
@@ -302,7 +362,7 @@ app.get('/api/resources', optionalAuth, (req, res) => {
 app.get('/api/resources/:id', (req, res) => {
   const resources = read('resources.json');
   const r = resources.find(r => r.id === req.params.id);
-  if (!r) return res.status(404).json({ error: 'Ressource non trouvée' });
+  if (!r) return res.status(404).json({ error: 'Resource not found' });
   res.json(r);
 });
 
@@ -310,7 +370,7 @@ app.post('/api/resources', requireAuth, (req, res) => {
   const resources = read('resources.json');
   const r = {
     id: uid(),
-    title:       req.body.title?.trim() || 'Sans titre',
+    title:       req.body.title?.trim() || 'Untitled',
     description: req.body.description?.trim() || '',
     url:         req.body.url?.trim() || '',
     filename:    null,
@@ -318,6 +378,7 @@ app.post('/api/resources', requireAuth, (req, res) => {
     mimetype:    null,
     fileSize:    null,
     type:        req.body.type || 'Lien',
+    tags:        normTags(req.body.tags),
     status:      req.body.status || 'active',
     createdAt:   new Date().toISOString(),
     updatedAt:   new Date().toISOString()
@@ -341,12 +402,13 @@ app.post('/api/resources', requireAuth, (req, res) => {
 app.put('/api/resources/:id', requireAuth, (req, res) => {
   const resources = read('resources.json');
   const i = resources.findIndex(r => r.id === req.params.id);
-  if (i === -1) return res.status(404).json({ error: 'Ressource non trouvée' });
+  if (i === -1) return res.status(404).json({ error: 'Resource not found' });
 
   if (req.body.title !== undefined)       resources[i].title       = req.body.title.trim();
   if (req.body.description !== undefined) resources[i].description = req.body.description.trim();
   if (req.body.type !== undefined)        resources[i].type        = req.body.type;
   if (req.body.status !== undefined)      resources[i].status      = req.body.status;
+  if (req.body.tags !== undefined)        resources[i].tags        = normTags(req.body.tags);
 
   // Nouveau fichier
   if (req.body.filedata && req.body.filename) {
@@ -370,7 +432,7 @@ app.put('/api/resources/:id', requireAuth, (req, res) => {
 app.delete('/api/resources/:id', requireAuth, (req, res) => {
   let resources = read('resources.json');
   const r = resources.find(r => r.id === req.params.id);
-  if (!r) return res.status(404).json({ error: 'Ressource non trouvée' });
+  if (!r) return res.status(404).json({ error: 'Resource not found' });
   deleteFile(r.filename);
   resources = resources.filter(r => r.id !== req.params.id);
   write('resources.json', resources);
@@ -383,7 +445,7 @@ app.delete('/api/resources/:id', requireAuth, (req, res) => {
 
 app.post('/api/contact', (req, res) => {
   const { name, email, subject, message } = req.body;
-  if (!name || !email || !message) return res.status(400).json({ error: 'Champs requis' });
+  if (!name || !email || !message) return res.status(400).json({ error: 'Required fields missing' });
   const messages = read('messages.json');
   messages.push({ id: uid(), name: name.trim(), email: email.trim(), subject: subject?.trim() || '(sans objet)', message: message.trim(), read: false, createdAt: new Date().toISOString() });
   write('messages.json', messages);
@@ -399,7 +461,7 @@ app.get('/api/messages', requireAuth, (req, res) => {
 app.put('/api/messages/:id', requireAuth, (req, res) => {
   const msgs = read('messages.json');
   const i = msgs.findIndex(m => m.id === req.params.id);
-  if (i === -1) return res.status(404).json({ error: 'Message non trouvé' });
+  if (i === -1) return res.status(404).json({ error: 'Message not found' });
   msgs[i] = { ...msgs[i], ...req.body, id: req.params.id };
   write('messages.json', msgs);
   res.json(msgs[i]);
@@ -421,7 +483,7 @@ app.get('/api/pages', (req, res) => res.json(read('pages.json')));
 app.get('/api/pages/:slug', (req, res) => {
   const pages = read('pages.json');
   const page  = pages.find(p => p.slug === req.params.slug);
-  if (!page) return res.status(404).json({ error: 'Page non trouvée' });
+  if (!page) return res.status(404).json({ error: 'Page not found' });
   res.json(page);
 });
 
@@ -456,7 +518,7 @@ app.get('/api/stats', requireAuth, (req, res) => {
 // ── Fallback SPA ──────────────────────────────────────────────────────────
 app.get('*', (req, res) => {
   if (req.path.startsWith('/api/') || req.path.startsWith('/uploads/'))
-    return res.status(404).json({ error: 'Route non trouvée' });
+    return res.status(404).json({ error: 'Route not found' });
   res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
