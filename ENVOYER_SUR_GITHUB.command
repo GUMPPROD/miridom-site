@@ -43,15 +43,31 @@ git remote remove origin 2>/dev/null
 git remote add origin "https://GUMPPROD:${TOKEN}@${REPO}"
 
 echo "  ▶️  Envoi vers GitHub..."
-if git push -u origin main --force 2>&1 | grep -v "$TOKEN"; then
-  :
-fi
+SORTIE=$(git push -u origin main --force 2>&1); CODE=$?
+echo "$SORTIE" | grep -v "$TOKEN"
 
 # Retirer la clé de la configuration (sécurité)
 git remote set-url origin "https://${REPO}"
 
 echo ""
-echo "  ✅ Terminé ! Va vérifier sur github.com/GUMPPROD/miridom-site"
-echo "     Tu devrais y voir tous les fichiers du site."
+if [ $CODE -eq 0 ]; then
+  echo "  ✅ ENVOYÉ ! Render va redéployer tout seul (2 à 5 min)."
+  echo "     Vérifie sur github.com/GUMPPROD/miridom-site"
+elif echo "$SORTIE" | grep -q "403\|denied\|Permission"; then
+  echo "  ❌ REFUSÉ PAR GITHUB (erreur 403) — rien n'a été envoyé."
+  echo ""
+  echo "     La clé est bien reconnue, mais elle n'a pas le droit d'écrire."
+  echo "     → Si c'est un jeton CLASSIC : il faut cocher la case  repo"
+  echo "     → Si c'est un jeton FINE-GRAINED : il faut choisir le dépôt"
+  echo "       miridom-site et mettre  Contents : Read and write"
+  echo ""
+  echo "     Refais une clé, puis relance ce fichier."
+elif echo "$SORTIE" | grep -q "could not read\|Authentication\|401"; then
+  echo "  ❌ CLÉ REFUSÉE — rien n'a été envoyé."
+  echo "     La clé est invalide ou expirée. Génère-en une nouvelle."
+else
+  echo "  ❌ L'ENVOI A ÉCHOUÉ — rien n'a été envoyé."
+  echo "     Le message d'erreur exact est affiché juste au-dessus."
+fi
 echo ""
 read -p "  Entrée pour fermer..."
