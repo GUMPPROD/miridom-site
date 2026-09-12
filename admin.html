@@ -176,6 +176,10 @@
           <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
           Resources & Docs
         </button>
+        <button onclick="showSection('services')" class="sidebar-link" data-nav="services">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" stroke-width="2"/><path stroke-linecap="round" stroke-width="2" d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+          Services
+        </button>
         <div class="px-3 pt-4 pb-1"><span class="text-xs font-semibold text-green-600 uppercase tracking-wider">Site</span></div>
         <button onclick="showSection('messages')" class="sidebar-link" data-nav="messages">
           <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -275,6 +279,18 @@
         </div>
       </section>
 
+      <!-- ── CAREERS ── -->
+      <section data-section="services">
+        <div class="flex items-center justify-between mb-6">
+          <div><h2 class="text-2xl font-bold text-gray-900">Services</h2><p class="text-gray-500 text-sm mt-1">Services shown on the Services page</p></div>
+          <button onclick="openServiceModal(null)" class="btn-green">+ Add service</button>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div id="services-admin-list"><div class="p-12 text-center text-gray-400">Loading…</div></div>
+        </div>
+        <p class="text-xs text-gray-400 mt-4">Only services marked <b>Published</b> appear on the site. Everything except the name is optional — fill in what you need.</p>
+      </section>
+
       <!-- ── MESSAGES ── -->
       <section data-section="messages">
         <div class="mb-8"><h2 class="text-2xl font-bold text-gray-900">Messages</h2><p class="text-gray-500 text-sm mt-1">Contact form</p></div>
@@ -294,6 +310,13 @@
               <div><label class="form-label">Subtitle</label><textarea id="pg-home-heroSubtitle" rows="3" class="form-input resize-none"></textarea></div>
               <div><label class="form-label">Mission text</label><textarea id="pg-home-missionText" rows="4" class="form-input resize-none"></textarea></div>
               <button onclick="savePage('home',{heroTitle:v('pg-home-heroTitle'),heroSubtitle:v('pg-home-heroSubtitle'),missionText:v('pg-home-missionText')})" class="btn-green">Save</button>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h3 class="font-semibold text-gray-900 mb-5">Services</h3>
+            <div class="space-y-4">
+              <div><label class="form-label">Intro text (above the list of services)</label><textarea id="pg-services-intro" rows="3" class="form-input resize-none"></textarea></div>
+              <button onclick="savePage('services',{intro:v('pg-services-intro')})" class="btn-green">Save</button>
             </div>
           </div>
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
@@ -425,6 +448,73 @@
   </div>
 </div>
 
+<!-- ── SERVICE MODAL ── -->
+<div id="serviceModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-bold text-gray-900" id="service-modal-title">New service</h3>
+      <button onclick="document.getElementById('serviceModal').style.display='none'" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+    </div>
+    <input type="hidden" id="service-id" />
+    <div class="space-y-4">
+      <div><label class="form-label">Service name *</label><input id="service-title" type="text" class="form-input" placeholder="e.g. Legal information clinic" /></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div><label class="form-label">Format</label>
+          <select id="service-format-select" class="form-input" onchange="onFormatSelect()"></select>
+          <div id="service-format-custom" class="mt-2" style="display:none">
+            <input id="service-type" type="text" class="form-input" placeholder="Your own format, e.g. Drop-in evening" />
+            <p class="text-xs text-gray-400 mt-1">It is saved and added to the list for next time.</p>
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Price <span class="text-gray-400 font-normal">(optional)</span></label>
+          <input id="service-price" type="text" class="form-input" placeholder="Free — 25 EC$ — sliding scale…" />
+          <p class="text-xs text-gray-400 mt-1">Leave empty and nothing is shown on the site.</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div><label class="form-label">Where</label><input id="service-location" type="text" class="form-input" placeholder="Roseau, Dominica — island-wide — online" /></div>
+        <div></div>
+      </div>
+      <input type="hidden" id="service-status" value="draft" />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div><label class="form-label">Availability</label><input id="service-availability" type="text" class="form-input" placeholder="Mondays and Thursdays — from January 2027…" /></div>
+      </div>
+      <div><label class="form-label">Description</label>
+        <div class="border border-gray-200 rounded-xl overflow-hidden">
+          <div class="bg-gray-50 border-b border-gray-200 px-3 py-2 flex gap-1">
+            <button type="button" onclick="fmt('service-description','bold')" class="px-2 py-1 text-xs rounded hover:bg-gray-200 font-bold">G</button>
+            <button type="button" onclick="fmt('service-description','italic')" class="px-2 py-1 text-xs rounded hover:bg-gray-200 italic">I</button>
+            <button type="button" onclick="fmt('service-description','underline')" class="px-2 py-1 text-xs rounded hover:bg-gray-200 underline">S</button>
+            <button type="button" onclick="fmt('service-description','insertUnorderedList')" class="px-2 py-1 text-xs rounded hover:bg-gray-200">• List</button>
+          </div>
+          <div id="service-description" contenteditable="true" class="editor"></div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div><label class="form-label">Contact email</label><input id="service-contactEmail" type="email" class="form-input" placeholder="contact@miridom.org" /></div>
+        <div><label class="form-label">Or a page to learn more</label><input id="service-moreUrl" type="text" class="form-input" placeholder="https://…" /></div>
+      </div>
+      <p class="text-xs text-gray-400 -mt-2">You can fill in both — the site then shows two buttons. A link typed without https:// is completed automatically.</p>
+      <div><label class="form-label">Tags</label>
+        <div id="service-tags-box" class="tagbox"></div>
+        <div class="flex gap-2 mt-2">
+          <input id="service-tag-input" type="text" class="form-input" placeholder="Type a tag, then Enter or Add…" onkeydown="tagInputKey(event,'service')" onblur="flushTagInput('service')" />
+          <button type="button" class="btn-green whitespace-nowrap" onclick="flushTagInput('service')">+ Add</button>
+        </div>
+        <div id="service-tag-suggest"></div>
+      </div>
+      <div id="service-status-note" class="text-sm px-4 py-3 rounded-xl" style="display:none"></div>
+      <div class="flex flex-wrap gap-3 pt-2">
+        <button onclick="saveService('published')" class="btn-green flex-1" style="min-width:180px">✓ Publish on the site</button>
+        <button onclick="saveService('draft')" class="btn-gray">Save as draft</button>
+        <button onclick="document.getElementById('serviceModal').style.display='none'" class="btn-gray">Cancel</button>
+      </div>
+      <p class="text-xs text-gray-400">A draft is saved but stays invisible to visitors. You can publish it later from the list.</p>
+    </div>
+  </div>
+</div>
+
 <!-- ── RESOURCE MODAL (with file upload) ── -->
 <div id="resourceModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)this.style.display='none'">
   <div class="modal-box">
@@ -547,7 +637,7 @@ function initApp(user) {
   document.getElementById('userName').textContent    = user.name || 'Admin';
   document.getElementById('userEmail').textContent   = user.email;
   document.getElementById('userInitial').textContent = (user.name || 'A')[0].toUpperCase();
-  loadTags(); loadDashboard(); loadActualites(); loadMedia(); loadResources(); loadMessages(); loadPages();
+  loadTags(); loadFormats(); loadDashboard(); loadActualites(); loadMedia(); loadResources(); loadServices(); loadMessages(); loadPages();
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────
@@ -893,16 +983,177 @@ async function saveResource() {
   } catch(e) { toast(e.message,'red'); }
 }
 
+// ── CAREERS / OFFRES D'EMPLOI ────────────────────────────────────────────
+let _servicesA = [];
+
+async function loadServices() {
+  try {
+    _servicesA = await apiFetch('GET', '/api/services') || [];
+    renderServicesAdmin();
+  } catch (e) {
+    document.getElementById('services-admin-list').innerHTML = err(e.message);
+  }
+}
+
+function renderServicesAdmin() {
+  const el = document.getElementById('services-admin-list');
+  if (!el) return;
+  if (!_servicesA.length) {
+    el.innerHTML = '<div class="p-12 text-center text-gray-400"><p class="mb-3">No service yet</p><button onclick="openServiceModal(null)" class="btn-green">+ Add service</button></div>';
+    return;
+  }
+  el.innerHTML = makeTable(['Service', 'Format', 'Where', 'Status'], _servicesA.map(j => {
+    const contact = j.moreUrl ? 'Link' : (j.contactEmail ? j.contactEmail : '\u2014');
+    return '<tr>' +
+      '<td class="font-medium text-gray-900 max-w-xs"><div class="truncate">' + esc(j.title) + '</div>' +
+        '<div class="text-xs text-gray-400 truncate">Contact: ' + esc(contact) + (j.availability ? ' \u00b7 ' + esc(j.availability) : '') + '</div>' +
+        tagsMini(j) + '</td>' +
+      '<td class="text-sm text-gray-600">' + (j.type ? esc(j.type) : '<span class="text-gray-300">\u2014</span>') + '</td>' +
+      '<td class="text-sm text-gray-600">' + (j.location ? esc(j.location) : '<span class="text-gray-300">\u2014</span>') + '</td>' +
+      '<td><span class="' + (j.status === 'published' ? 'badge-green' : 'badge-yellow') + '">' + (j.status === 'published' ? 'Published' : 'Draft') + '</span></td>' +
+      '<td><div class="flex gap-2 justify-end items-center">' +
+        (j.status === 'published'
+          ? '<button onclick="publishService(\'' + j.id + '\',false)" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 text-gray-600 hover:border-gray-400">Unpublish</button>'
+          : '<button onclick="publishService(\'' + j.id + '\',true)" class="px-3 py-1.5 rounded-lg text-xs font-bold text-white" style="background:#059669">\u2713 Publish</button>') +
+        '<button onclick="editService(\'' + j.id + '\')" class="text-green-600 text-xs font-medium hover:text-green-800">Edit</button>' +
+        '<button onclick="deleteItem(\'services\',\'' + j.id + '\')" class="btn-red">Delete</button></div></td></tr>';
+  }).join(''));
+}
+
+function openServiceModal(j) {
+  document.getElementById('service-modal-title').textContent = j ? 'Edit service' : 'New service';
+  sv('service-id', j?.id || ''); sv('service-title', j?.title || '');
+  sv2('service-status', j?.status || 'draft');
+  const note = document.getElementById('service-status-note');
+  if (j && j.status === 'published') {
+    note.style.display = 'block';
+    note.className = 'text-sm px-4 py-3 rounded-xl bg-green-50 text-green-800 border border-green-200';
+    note.textContent = 'This service is published — visitors can see it right now.';
+  } else if (j) {
+    note.style.display = 'block';
+    note.className = 'text-sm px-4 py-3 rounded-xl bg-yellow-50 text-yellow-800 border border-yellow-200';
+    note.textContent = 'This service is a draft — nobody sees it yet.';
+  } else {
+    note.style.display = 'none';
+  }
+  const fmt = j?.type || '';
+  const sel = document.getElementById('service-format-select');
+  if (_allFormats.some(f => f === fmt)) { renderFormatSuggest(fmt); sv2('service-type', ''); }
+  else if (fmt) { renderFormatSuggest('__other__'); sv2('service-type', fmt); document.getElementById('service-format-custom').style.display = 'block'; }
+  else { renderFormatSuggest(''); sv2('service-type', ''); }
+  sv2('service-price', j?.price || ''); sv2('service-location', j?.location || '');
+  sv2('service-availability', j?.availability || '');
+  sv2('service-contactEmail', j?.contactEmail || ''); sv2('service-moreUrl', j?.moreUrl || '');
+  document.getElementById('service-description').innerHTML = j?.description || '';
+  _serviceTags = Array.isArray(j?.tags) ? j.tags.slice() : [];
+  sv2('service-tag-input', ''); renderTagEditor('service');
+  document.getElementById('serviceModal').style.display = 'flex';
+}
+
+function editService(id) { openServiceModal(_servicesA.find(j => j.id === id)); }
+
+async function saveService(statut) {
+  flushTagInput('service');
+  const id = v('service-id');
+  const status = (statut === 'published') ? 'published' : 'draft';
+  const body = {
+    title:       v('service-title'),
+    status:      status,
+    type:        formatChoisi(),
+    price:       v('service-price'),
+    location:    v('service-location'),
+    availability:    v('service-availability'),
+    contactEmail:  v('service-contactEmail'),
+    moreUrl:    v('service-moreUrl'),
+    description: document.getElementById('service-description').innerHTML,
+    tags:        _serviceTags.slice()
+  };
+  if (!body.title) { toast('Service name required', 'red'); return; }
+  try {
+    if (id) await apiFetch('PUT', '/api/services/' + id, body);
+    else    await apiFetch('POST', '/api/services', body);
+    document.getElementById('serviceModal').style.display = 'none';
+    toast(status === 'published' ? 'Published \u2014 now visible on the site \u2713' : 'Saved as draft \u2014 not visible yet');
+    if (body.type) rememberFormat(body.type);
+    loadServices(); loadTags();
+  } catch (e) { toast(e.message, 'red'); }
+}
+
+// ── FORMATS DE SERVICE ───────────────────────────────────────────────────
+let _allFormats = [];
+
+async function loadFormats() {
+  try { const f = await apiFetch('GET', '/api/formats'); _allFormats = Array.isArray(f) ? f : []; }
+  catch (e) { _allFormats = []; }
+  renderFormatSuggest();
+}
+
+// La liste contient les formats de base + ceux deja crees, puis « Other »
+function renderFormatSuggest(valeurCourante) {
+  const sel = document.getElementById('service-format-select');
+  if (!sel) return;
+  const actuelle = (valeurCourante !== undefined) ? valeurCourante : sel.value;
+  sel.innerHTML =
+    '<option value="">— No format —</option>' +
+    _allFormats.map(f => '<option value="' + escAttr(f) + '">' + esc(f) + '</option>').join('') +
+    '<option value="__other__">+ Other (write your own)</option>';
+  // on remet la selection si elle existe toujours
+  if (actuelle === '__other__' || (actuelle && !_allFormats.some(f => f === actuelle))) {
+    sel.value = actuelle && actuelle !== '__other__' ? '__other__' : (actuelle || '');
+  } else {
+    sel.value = actuelle || '';
+  }
+  onFormatSelect(true);
+}
+
+function escAttr(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function onFormatSelect(silencieux) {
+  const sel = document.getElementById('service-format-select');
+  const box = document.getElementById('service-format-custom');
+  if (!sel || !box) return;
+  const perso = sel.value === '__other__';
+  box.style.display = perso ? 'block' : 'none';
+  if (perso && !silencieux) document.getElementById('service-type').focus();
+  if (!perso) sv2('service-type', '');
+}
+
+// Le format retenu : celui de la liste, ou celui tape a la main
+function formatChoisi() {
+  const sel = document.getElementById('service-format-select');
+  if (!sel) return v('service-type');
+  return sel.value === '__other__' ? v('service-type').trim() : sel.value;
+}
+
+function rememberFormat(name) {
+  name = String(name || '').trim();
+  if (!name) return;
+  if (_allFormats.some(f => f.toLowerCase() === name.toLowerCase())) return;
+  _allFormats.push(name);
+  _allFormats.sort((a, b) => a.localeCompare(b));
+  renderFormatSuggest();
+  apiFetch('POST', '/api/formats', { name }).catch(() => {});
+}
+
+// ── publier / depublier depuis la liste ──────────────────────────────────
+async function publishService(id, publier) {
+  try {
+    await apiFetch('PUT', '/api/services/' + id, { status: publier ? 'published' : 'draft' });
+    toast(publier ? 'Published \u2014 now visible on the site \u2713' : 'Unpublished \u2014 hidden from visitors');
+    loadServices();
+  } catch (e) { toast(e.message, 'red'); }
+}
+
 // ── TAGS ─────────────────────────────────────────────────────────────────
-let _allTags = [], _actuTags = [], _resTags = [];
+let _allTags = [], _actuTags = [], _resTags = [], _serviceTags = [];
 
 async function loadTags() {
   try { const t = await apiFetch('GET', '/api/tags'); _allTags = Array.isArray(t) ? t : []; }
   catch (e) { _allTags = []; }
-  renderTagEditor('actu'); renderTagEditor('res');
+  renderTagEditor('actu'); renderTagEditor('res'); renderTagEditor('service');
 }
 
-function selTags(ns) { return ns === 'actu' ? _actuTags : _resTags; }
+function selTags(ns) { return ns === 'actu' ? _actuTags : (ns === 'service' ? _serviceTags : _resTags); }
 
 function renderTagEditor(ns) {
   const sel = selTags(ns);
@@ -1013,6 +1264,8 @@ async function loadPages() {
     const a = pages.find(p=>p.slug==='about') || {};
     sv2('pg-home-heroTitle', h.heroTitle||''); sv2('pg-home-heroSubtitle', h.heroSubtitle||''); sv2('pg-home-missionText', h.missionText||'');
     sv2('pg-about-mission', a.mission||''); sv2('pg-about-vision', a.vision||''); sv2('pg-about-content', a.content||'');
+    const jb = pages.find(p=>p.slug==='services') || {};
+    sv2('pg-services-intro', jb.intro||'');
   } catch {}
 }
 
@@ -1023,7 +1276,7 @@ async function savePage(slug, body) {
 
 // ── Generic ───────────────────────────────────────────────────────────────
 async function toggleStatus(type, id, status) {
-  try { await apiFetch('PUT','/api/'+type+'/'+id,{status:status==='published'?'draft':'published'}); toast('Status updated'); if(type==='articles') loadActualites(); }
+  try { await apiFetch('PUT','/api/'+type+'/'+id,{status:status==='published'?'draft':'published'}); toast('Status updated'); if(type==='articles') loadActualites(); if(type==='services') loadServices(); }
   catch(e) { toast(e.message,'red'); }
 }
 
@@ -1035,6 +1288,7 @@ async function deleteItem(type, id) {
     if (type==='media') loadMedia();
     if (type==='resources') { loadResources(); loadDashboard(); }
     if (type==='messages') loadMessages();
+    if (type==='services') { loadServices(); loadDashboard(); }
   } catch(e) { toast(e.message,'red'); }
 }
 

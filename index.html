@@ -115,7 +115,7 @@
       margin-bottom: 24px;
     }
     .hero-h1 .highlight {
-      color: #6EE7B7;
+      color: #FF4D4D;
     }
     .hero-sub {
       font-size: 17px; line-height: 1.7;
@@ -560,12 +560,74 @@
     /* ══ Mobile (compléments) ══ */
     @media (max-width: 768px) {
       /* le logo occupe toute la largeur dispo, en gardant la place du bouton menu */
-      .nav-logo { width: min(324px, calc(100vw - 100px)) !important; height: auto !important; }
+      .nav-logo { width: min(324px, calc(100vw - 146px)) !important; height: auto !important; }
       .footer-logo { height:52px !important; }
       .sec-pad { padding:40px 20px; }
       .search-box { max-width:none; }
       .tag-chip { font-size:13px; padding:9px 15px; }
       .card-tags { margin-top:8px; }
+    }
+
+    /* ══ Loupe de navigation + recherche globale ══ */
+    .nav-actions { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+    .nav-search-btn { width:44px; height:44px; border-radius:999px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background .2s, border-color .2s; flex-shrink:0; padding:0; }
+    .nav-search-btn svg { stroke:#fff; transition:stroke .2s; }
+    .nav-search-btn:hover { background:#fff; border-color:#fff; }
+    .nav-search-btn:hover svg { stroke:#0A0F0D; }
+    .nav-search-btn:focus-visible { outline:2px solid #34D399; outline-offset:3px; }
+
+    .ss-overlay[hidden] { display:none !important; }   /* sinon le panneau invisible bloque les clics */
+    .ss-overlay { position:fixed; inset:0; z-index:300; background:rgba(4,10,8,0.84); display:flex; align-items:flex-start; justify-content:center; padding:84px 20px 40px; }
+    .ss-panel { width:100%; max-width:680px; background:#0F1A15; border:1px solid rgba(255,255,255,0.10); border-radius:18px; overflow:hidden; box-shadow:0 40px 80px rgba(0,0,0,0.5); display:flex; flex-direction:column; max-height:calc(100vh - 124px); }
+    .ss-head { display:flex; align-items:center; gap:12px; padding:18px 20px; border-bottom:1px solid rgba(255,255,255,0.08); flex-shrink:0; }
+    .ss-head input { flex:1; min-width:0; background:transparent; border:none; outline:none; color:#fff; font-family:inherit; font-size:17px; }
+    .ss-head input::placeholder { color:rgba(255,255,255,0.35); }
+    .ss-head input::-webkit-search-cancel-button { -webkit-appearance:none; appearance:none; }
+    .ss-esc { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.55); font-family:inherit; font-size:11px; font-weight:700; letter-spacing:0.06em; padding:7px 11px; border-radius:7px; cursor:pointer; flex-shrink:0; }
+    .ss-esc:hover { color:#fff; border-color:rgba(255,255,255,0.3); }
+    .ss-results { overflow-y:auto; padding:8px; }
+    .ss-group { font-size:11px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:#34D399; padding:14px 14px 6px; }
+    .ss-item { display:block; width:100%; text-align:left; background:none; border:none; font-family:inherit; padding:12px 14px; border-radius:11px; cursor:pointer; color:#fff; }
+    .ss-item:hover, .ss-item:focus-visible { background:rgba(5,150,105,0.16); outline:none; }
+    .ss-item-t { font-size:15px; font-weight:700; line-height:1.35; }
+    .ss-item-s { font-size:12.5px; color:rgba(255,255,255,0.45); margin-top:4px; line-height:1.5; }
+    .ss-msg { padding:40px 16px; text-align:center; color:rgba(255,255,255,0.4); font-size:15px; }
+
+    /* ══ Offres d'emploi ══ */
+    .service-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:24px; transition:border-color .2s, background .2s; }
+    .service-card:hover { border-color:rgba(52,211,153,0.28); background:rgba(255,255,255,0.055); }
+    .service-title { font-family:'Plus Jakarta Sans',sans-serif; font-size:19px; font-weight:800; color:#fff; letter-spacing:-0.01em; line-height:1.3; }
+    .service-meta { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .service-chip { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:rgba(255,255,255,0.6); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09); padding:6px 11px; border-radius:8px; }
+    .service-chip.service-availability { color:#FCD34D; border-color:rgba(252,211,77,0.25); background:rgba(252,211,77,0.08); }
+    .service-chip.service-price { color:#6EE7B7; border-color:rgba(110,231,183,0.25); background:rgba(110,231,183,0.08); }
+    .service-desc { color:rgba(255,255,255,0.58); font-size:15px; line-height:1.7; margin-top:16px; }
+    .service-desc p { margin:0 0 10px; }
+    .service-desc ul, .service-desc ol { margin:0 0 10px; padding-left:20px; }
+    .service-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; }
+    .service-cta { display:inline-flex; align-items:center; gap:8px; background:#059669; color:#fff; font-family:inherit; font-size:13px; font-weight:700; padding:12px 20px; border-radius:10px; text-decoration:none; border:none; cursor:pointer; }
+    .service-cta:hover { background:#047857; }
+    .service-toggle, .service-link { background:none; border:1px solid rgba(255,255,255,0.14); color:rgba(255,255,255,0.6); font-family:inherit; font-size:13px; font-weight:600; padding:12px 18px; border-radius:10px; cursor:pointer; }
+    .service-toggle:hover, .service-link:hover { border-color:rgba(255,255,255,0.3); color:#fff; }
+    a.service-link { text-decoration:none; display:inline-flex; align-items:center; }
+
+    /* ══ Compléments responsive pour la loupe et les offres ══ */
+    @media (max-width: 1024px) and (min-width: 769px) {
+      .nav-search-btn { width:40px; height:40px; }
+      /* le pied de page passe sur deux colonnes, sinon la colonne Contact est coupee */
+      footer { padding:48px 32px 32px; }
+      footer .m-collapse { grid-template-columns:1fr 1fr !important; gap:32px 28px !important; }
+      footer .m-collapse > div { min-width:0; }
+      footer { overflow-wrap:anywhere; }
+    }
+    @media (max-width: 768px) {
+      .nav-search-btn { width:40px; height:40px; }
+      .ss-overlay { padding:64px 14px 20px; }
+      .ss-panel { max-height:calc(100vh - 84px); }
+      .ss-head { padding:14px 16px; }
+      .ss-head input { font-size:16px; }
+      .service-card { padding:18px 16px; }
+      .service-actions .service-cta, .service-actions .service-toggle, .service-actions .service-link { flex:1 0 100%; justify-content:center; text-align:center; }
     }
   </style>
 </head>
@@ -586,17 +648,34 @@
     <button class="nav-link" data-page="actualites" onclick="showPage('actualites')">News</button>
     <button class="nav-link" data-page="ressources" onclick="showPage('ressources')">Resources</button>
     <button class="nav-link" data-page="droits" onclick="showPage('droits')">Rights</button>
+    <button class="nav-link" data-page="services" onclick="showPage('services')">Services</button>
     <button class="nav-link" data-page="contact" onclick="showPage('contact')">Contact</button>
   </div>
-  <button id="nav-burger" onclick="toggleMobileMenu()" aria-label="Menu">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round">
-      <line x1="3" y1="6" x2="21" y2="6"></line>
-      <line x1="3" y1="12" x2="21" y2="12"></line>
-      <line x1="3" y1="18" x2="21" y2="18"></line>
-    </svg>
-  </button>
-  <button class="btn-nav-cta" onclick="showPage('contact')">Contact us</button>
+  <div class="nav-actions">
+    <button class="nav-search-btn" onclick="openSiteSearch()" aria-label="Search the site" title="Search">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+    </button>
+    <button id="nav-burger" onclick="toggleMobileMenu()" aria-label="Menu">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+  </div>
 </nav>
+
+<!-- ══════════════════════════════════════════ RECHERCHE GLOBALE ══ -->
+<div id="site-search" class="ss-overlay" hidden onclick="if(event.target===this)closeSiteSearch()">
+  <div class="ss-panel" role="dialog" aria-modal="true" aria-label="Search the site">
+    <div class="ss-head">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      <input id="ss-input" type="search" placeholder="Search news, resources, services…" aria-label="Search the site" oninput="ssRender(this.value)" />
+      <button class="ss-esc" onclick="closeSiteSearch()">ESC</button>
+    </div>
+    <div class="ss-results" id="ss-results"></div>
+  </div>
+</div>
 
 <!-- ══════════════════════════════════════════ PAGE : ACCUEIL ══ -->
 <div id="page-accueil" class="page active">
@@ -865,10 +944,6 @@
   <section class="sec-pad" style="background:white">
     <div style="max-width:1100px;margin:0 auto">
       <div class="tools-bar tools-light">
-        <div class="search-box search-light">
-          <svg width="17" height="17" fill="none" stroke="#9CA3AF" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="M20 20l-3.5-3.5"/></svg>
-          <input type="search" id="actu-search" placeholder="Search news…" aria-label="Search news" oninput="onActuSearch(this.value)" />
-        </div>
         <div class="tag-bar" id="actu-tagbar"></div>
       </div>
       <div id="actualites-list" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
@@ -894,14 +969,30 @@
   <section class="sec-pad" style="background:var(--dark-2)">
     <div style="max-width:860px;margin:0 auto">
       <div class="tools-bar tools-dark">
-        <div class="search-box search-dark">
-          <svg width="17" height="17" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path stroke-linecap="round" d="M20 20l-3.5-3.5"/></svg>
-          <input type="search" id="res-search" placeholder="Search resources…" aria-label="Search resources" oninput="onResSearch(this.value)" />
-        </div>
         <div class="tag-bar" id="res-tagbar"></div>
       </div>
       <div id="ressources-dynamic-list">
         <div style="color:rgba(255,255,255,0.3);text-align:center;padding:60px">Loading…</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════════ PAGE : CAREERS ══ -->
+<div id="page-services" class="page">
+  <div class="page-header">
+    <div class="section-tag">Services</div>
+    <h1 class="page-header-h1">Services offered</h1>
+    <p class="page-header-sub" id="services-intro">The services MiRiDom offers to the community.</p>
+  </div>
+
+  <section class="sec-pad" style="background:var(--dark-2)">
+    <div style="max-width:860px;margin:0 auto">
+      <div class="tools-bar tools-dark">
+        <div class="tag-bar" id="services-tagbar"></div>
+      </div>
+      <div id="services-list" style="display:flex;flex-direction:column;gap:14px">
+        <div style="color:rgba(255,255,255,0.3);text-align:center;padding:60px 0">Loading…</div>
       </div>
     </div>
   </section>
@@ -1058,6 +1149,7 @@
           <button class="footer-link" onclick="showPage('actualites')">News</button>
           <button class="footer-link" onclick="showPage('ressources')">Resources</button>
           <button class="footer-link" onclick="showPage('droits')">Rights</button>
+          <button class="footer-link" onclick="showPage('services')">Services</button>
         </div>
       </div>
       <div>
@@ -1122,6 +1214,7 @@ function showPage(pageId) {
   if (pageId === 'actualites') loadActualitesPage();
   if (pageId === 'ressources') loadRessourcesPage();
   if (pageId === 'apropos') loadAboutPage();
+  if (pageId === 'services') loadServicesPage();
 }
 
 // ── Article card template ─────────────────────────────────────────
@@ -1177,7 +1270,7 @@ function filterItems(list, q, tag) {
   return list.filter(o => {
     if (tag && !itemTags(o).some(t => t.toLowerCase() === tag.toLowerCase())) return false;
     if (!query) return true;
-    const hay = [o.title, o.excerpt, o.description, o.content, o.originalFilename, itemTags(o).join(' ')]
+    const hay = [o.title, o.excerpt, o.description, o.content, o.originalFilename, o.location, o.type, itemTags(o).join(' ')]
       .filter(Boolean).join(' ').replace(/<[^>]*>/g, ' ').toLowerCase();
     return hay.indexOf(query) !== -1;
   });
@@ -1209,6 +1302,194 @@ function applyActuFilters() {
 
 function setResTag(t) { _resTag = (_resTag === t ? '' : t); renderRessources(); }
 function onResSearch(v) { _resQuery = v; renderRessources(); }
+
+// ── Careers / offres d'emploi ─────────────────────────────────────
+let _services = [], _servicesLoaded = false, _servicesTag = '', _serviceOpen = null;
+
+async function loadServicesPage() {
+  if (!_servicesLoaded) {
+    const [j, p] = await Promise.all([callApi('/api/services'), callApi('/api/pages/services')]);
+    _services = Array.isArray(j) ? j : [];
+    _servicesLoaded = true;
+    const el = document.getElementById('services-intro');
+    if (el && p && p.intro) el.textContent = p.intro;
+  }
+  renderServices();
+}
+
+function setServicesTag(t) { _servicesTag = (_servicesTag === t ? '' : t); renderServices(); }
+
+function toggleService(id) {
+  _serviceOpen = (_serviceOpen === id ? null : id);
+  renderServices();
+  const el = document.getElementById('service-' + id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function safeUrl(u) {
+  const v = String(u || '').trim();
+  if (!v) return '';
+  if (/^(https?:|mailto:|tel:|\/)/i.test(v)) return v;
+  return 'https://' + v;          // saisi sans https:// : on complete
+}
+
+const SERVICE_ICONS = {
+  type: '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>',
+  place: '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 21s7-5.2 7-11a7 7 0 10-14 0c0 5.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  price: '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.6 13.4 12 22l-9-9V3h10l7.6 7.6a2 2 0 010 2.8z"/><circle cx="7.5" cy="7.5" r="1.3"/></svg>',
+  clock: '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
+};
+
+function serviceCardHTML(j) {
+  const open = _serviceOpen === j.id;
+  const chips = [];
+  if (j.type)     chips.push('<span class="service-chip">' + SERVICE_ICONS.type + esc(j.type) + '</span>');
+  if (j.price)    chips.push('<span class="service-chip service-price">' + SERVICE_ICONS.price + esc(j.price) + '</span>');
+  if (j.location) chips.push('<span class="service-chip">' + SERVICE_ICONS.place + esc(j.location) + '</span>');
+  if (j.availability) chips.push('<span class="service-chip service-availability">' + SERVICE_ICONS.clock + esc(j.availability) + '</span>');
+
+  const hasDesc = !!(j.description && String(j.description).trim());
+  let apply = '';
+  if (j.contactEmail) {
+    apply += '<a class="service-cta" href="mailto:' + escA(j.contactEmail) + '?subject=' + encodeURIComponent('Service enquiry \u2014 ' + (j.title || '')) + '">Contact by email \u2192</a>';
+  }
+  if (j.moreUrl) {
+    const cls = j.contactEmail ? 'service-link' : 'service-cta';   // le 2e bouton reste discret, mais a sa propre classe
+    apply += '<a class="' + cls + '" href="' + escA(safeUrl(j.moreUrl)) + '" target="_blank" rel="noopener">Learn more \u2192</a>';
+  }
+
+  return '<article class="service-card" id="service-' + escA(j.id) + '">' +
+    '<div class="service-title">' + esc(j.title) + '</div>' +
+    (chips.length ? '<div class="service-meta">' + chips.join('') + '</div>' : '') +
+    tagsHTML(j, 'dark') +
+    (open && hasDesc ? '<div class="service-desc">' + j.description + '</div>' : '') +
+    '<div class="service-actions">' + apply +
+      (hasDesc ? '<button type="button" class="service-toggle" onclick="toggleService(\'' + escA(j.id) + '\')">' + (open ? 'Hide details' : 'View details') + '</button>' : '') +
+    '</div>' +
+  '</article>';
+}
+
+function renderServices() {
+  const el = document.getElementById('services-list');
+  if (!el) return;
+  renderTagBar('services-tagbar', _services, _servicesTag, 'setServicesTag');
+  const list = filterItems(_services, '', _servicesTag);
+  if (!list.length) {
+    const msg = _servicesTag
+      ? 'No service matches this tag.'
+      : 'No service listed yet. Check back soon, or reach out through the contact page.';
+    el.innerHTML = '<div style="color:rgba(255,255,255,0.35);text-align:center;padding:70px 20px;font-size:15px;line-height:1.7">' + msg + '</div>';
+    return;
+  }
+  el.innerHTML = list.map(j => serviceCardHTML(j)).join('');
+}
+
+// ── Recherche globale (loupe de la barre du haut) ─────────────────
+let _ssLoaded = false;
+let _ssData = { articles: [], resources: [], services: [] };
+
+async function openSiteSearch() {
+  const ov = document.getElementById('site-search');
+  if (!ov) return;
+  ov.hidden = false;
+  document.body.style.overflow = 'hidden';
+  const input = document.getElementById('ss-input');
+  input.value = '';
+  document.getElementById('ss-results').innerHTML =
+    '<div class="ss-msg">Search across news, resources and services.</div>';
+  input.focus();
+  if (!_ssLoaded) {
+    const [a, r, j] = await Promise.all([
+      callApi('/api/articles'), callApi('/api/resources'), callApi('/api/services')
+    ]);
+    _ssData = {
+      articles:  Array.isArray(a) ? a : [],
+      resources: Array.isArray(r) ? r : [],
+      services:      Array.isArray(j) ? j : []
+    };
+    _ssLoaded = true;
+    if (input.value.trim()) ssRender(input.value);
+  }
+}
+
+function closeSiteSearch() {
+  const ov = document.getElementById('site-search');
+  if (!ov) return;
+  ov.hidden = true;
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function (e) {
+  const ov = document.getElementById('site-search');
+  if (!ov) return;
+  if (e.key === 'Escape' && !ov.hidden) closeSiteSearch();
+  // « / » ouvre la recherche, sauf si on est deja dans un champ
+  if (e.key === '/' && ov.hidden) {
+    const t = e.target.tagName;
+    if (t !== 'INPUT' && t !== 'TEXTAREA' && !e.target.isContentEditable) { e.preventDefault(); openSiteSearch(); }
+  }
+});
+
+function ssItem(kind, o, sub) {
+  return '<button type="button" class="ss-item" onclick="ssGo(\'' + kind + '\',\'' + escA(o.id) + '\')">' +
+    '<div class="ss-item-t">' + esc(o.title) + '</div>' +
+    (sub ? '<div class="ss-item-s">' + esc(sub) + '</div>' : '') +
+  '</button>';
+}
+
+function ssRender(q) {
+  const el = document.getElementById('ss-results');
+  if (!el) return;
+  const query = (q || '').trim();
+  if (!_ssLoaded) { el.innerHTML = '<div class="ss-msg">Loading\u2026</div>'; return; }
+  if (query.length < 2) {
+    el.innerHTML = '<div class="ss-msg">Search across news, resources and services.</div>';
+    return;
+  }
+  const arts = filterItems(_ssData.articles, query, '');
+  const res  = filterItems(_ssData.resources, query, '');
+  const services = filterItems(_ssData.services, query, '');
+
+  if (!arts.length && !res.length && !services.length) {
+    el.innerHTML = '<div class="ss-msg">Nothing found for \u201c' + esc(query) + '\u201d.</div>';
+    return;
+  }
+
+  let h = '';
+  if (arts.length) {
+    h += '<div class="ss-group">News \u00b7 ' + arts.length + '</div>';
+    h += arts.map(a => ssItem('article', a, [a.date, (a.excerpt || '').replace(/<[^>]*>/g, ' ').slice(0, 90)].filter(Boolean).join('  \u00b7  '))).join('');
+  }
+  if (res.length) {
+    h += '<div class="ss-group">Resources \u00b7 ' + res.length + '</div>';
+    h += res.map(r => ssItem('res', r, [r.filename ? 'Document' : 'Link', (r.description || '').slice(0, 90)].filter(Boolean).join('  \u00b7  '))).join('');
+  }
+  if (services.length) {
+    h += '<div class="ss-group">Services \u00b7 ' + services.length + '</div>';
+    h += services.map(j => ssItem('service', j, [j.type, j.location].filter(Boolean).join('  \u00b7  '))).join('');
+  }
+  el.innerHTML = h;
+}
+
+function ssGo(kind, id) {
+  closeSiteSearch();
+  if (kind === 'article') { showArticle(id); return; }
+  if (kind === 'res') {
+    const r = _ssData.resources.find(x => x.id === id);
+    if (r && r.url) { window.open(r.url, '_blank', 'noopener'); return; }
+    showPage('ressources');
+    return;
+  }
+  if (kind === 'service') {
+    showPage('services');
+    _serviceOpen = id;
+    setTimeout(function () {
+      renderServices();
+      const el = document.getElementById('service-' + id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 450);
+  }
+}
 
 // ── Home articles ─────────────────────────────────────────────────
 let _allArticles = [];

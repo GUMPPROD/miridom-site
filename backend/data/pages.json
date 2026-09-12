@@ -17,5 +17,10 @@
     "slug": "legal",
     "content": "MiRiDom is a non-profit organization. All information published on this site is provided for informational purposes only.",
     "updatedAt": "2026-04-14T06:05:20.194Z"
+  },
+  {
+    "slug": "services",
+    "intro": "The services MiRiDom offers to the community. Each one is listed below with what it covers and how to reach us about it.",
+    "updatedAt": "2026-09-11T00:00:00.000Z"
   }
 ]

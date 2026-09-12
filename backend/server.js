@@ -253,6 +253,104 @@ app.delete('/api/articles/:id', requireAuth, (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
+// SERVICES / OFFRES D'EMPLOI
+// ═══════════════════════════════════════════════════════════════════════════
+
+function cleanService(b, base) {
+  const o = base || {};
+  const set = (k, v) => { if (v !== undefined) o[k] = v; };
+  if (b.title       !== undefined) set('title', String(b.title).trim() || 'Untitled service');
+  if (b.type        !== undefined) set('type', String(b.type).trim());
+  if (b.location    !== undefined) set('location', String(b.location).trim());
+  if (b.description !== undefined) set('description', b.description);
+  if (b.availability    !== undefined) set('availability', String(b.availability).trim());
+  if (b.contactEmail  !== undefined) set('contactEmail', String(b.contactEmail).trim());
+  if (b.moreUrl    !== undefined) set('moreUrl', normUrl(b.moreUrl));
+  if (b.price      !== undefined) set('price', String(b.price).trim());
+  if (b.tags        !== undefined) set('tags', normTags(b.tags));
+  if (b.status      !== undefined) set('status', b.status === 'published' ? 'published' : 'draft');
+  return o;
+}
+
+app.get('/api/services', optionalAuth, (req, res) => {
+  let services = read('services.json');
+  if (!req.user) services = services.filter(j => j.status === 'published');
+  services.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  res.json(services);
+});
+
+app.get('/api/services/:id', optionalAuth, (req, res) => {
+  const service = read('services.json').find(j => j.id === req.params.id);
+  if (!service || (!req.user && service.status !== 'published'))
+    return res.status(404).json({ error: 'Service not found' });
+  res.json(service);
+});
+
+app.post('/api/services', requireAuth, (req, res) => {
+  const services = read('services.json');
+  const service = cleanService(req.body, {
+    id: uid(), title: 'Untitled service', type: '', price: '', location: '', description: '',
+    availability: '', contactEmail: '', moreUrl: '', tags: [], status: 'draft',
+    createdAt: new Date().toISOString()
+  });
+  service.updatedAt = new Date().toISOString();
+  services.push(service);
+  write('services.json', services);
+  res.status(201).json(service);
+});
+
+app.put('/api/services/:id', requireAuth, (req, res) => {
+  const services = read('services.json');
+  const i = services.findIndex(j => j.id === req.params.id);
+  if (i === -1) return res.status(404).json({ error: 'Service not found' });
+  services[i] = cleanService(req.body, services[i]);
+  services[i].id = req.params.id;
+  services[i].updatedAt = new Date().toISOString();
+  write('services.json', services);
+  res.json(services[i]);
+});
+
+app.delete('/api/services/:id', requireAuth, (req, res) => {
+  write('services.json', read('services.json').filter(j => j.id !== req.params.id));
+  res.json({ ok: true });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FORMATS DE SERVICE (reutilisables)
+// ═══════════════════════════════════════════════════════════════════════════
+
+const FORMATS_PAR_DEFAUT = ['Free', 'On request', 'Workshop', 'Training', 'One-to-one support', 'Referral'];
+
+function allFormats() {
+  const stored = read('formats.json');
+  const used   = read('services.json').map(x => String(x.type || '').trim()).filter(Boolean);
+  const base   = (Array.isArray(stored) && stored.length) ? stored : FORMATS_PAR_DEFAUT;
+  return normTags([].concat(base, used)).sort((a, b) => a.localeCompare(b));
+}
+
+app.get('/api/formats', (req, res) => res.json(allFormats()));
+
+app.post('/api/formats', requireAuth, (req, res) => {
+  const name = String(req.body.name || '').trim();
+  if (!name) return res.status(400).json({ error: 'Format name required' });
+  const stored = read('formats.json');
+  const list = (Array.isArray(stored) && stored.length) ? stored : FORMATS_PAR_DEFAUT.slice();
+  if (!list.some(f => String(f).toLowerCase() === name.toLowerCase())) {
+    list.push(name);
+    write('formats.json', normTags(list));
+  }
+  res.status(201).json(allFormats());
+});
+
+app.delete('/api/formats/:name', requireAuth, (req, res) => {
+  const name = decodeURIComponent(req.params.name).toLowerCase();
+  const stored = read('formats.json');
+  const list = (Array.isArray(stored) && stored.length) ? stored : FORMATS_PAR_DEFAUT.slice();
+  write('formats.json', list.filter(f => String(f).toLowerCase() !== name));
+  res.json(allFormats());
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
 // TAGS
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -261,7 +359,8 @@ function allTags() {
   const stored = read('tags.json');
   const used   = [].concat(
     ...read('articles.json').map(a => normTags(a.tags)),
-    ...read('resources.json').map(r => normTags(r.tags))
+    ...read('resources.json').map(r => normTags(r.tags)),
+    ...read('services.json').map(j => normTags(j.tags))
   );
   return normTags([].concat(Array.isArray(stored) ? stored : [], used))
     .sort((a, b) => a.localeCompare(b));
@@ -292,6 +391,9 @@ app.delete('/api/tags/:name', requireAuth, (req, res) => {
   const resources = read('resources.json');
   resources.forEach(r => { r.tags = normTags(r.tags).filter(t => t.toLowerCase() !== name); });
   write('resources.json', resources);
+  const services = read('services.json');
+  services.forEach(j => { j.tags = normTags(j.tags).filter(t => t.toLowerCase() !== name); });
+  write('services.json', services);
   res.json(allTags());
 });
 
@@ -510,6 +612,8 @@ app.get('/api/stats', requireAuth, (req, res) => {
     articlesPublished: arts.filter(a => a.status === 'published').length,
     resources:        res_.length,
     documents:        files.length,
+    services:             read('services.json').length,
+    servicesPublished:    read('services.json').filter(j => j.status === 'published').length,
     messages:         msgs.length,
     unreadMessages:   msgs.filter(m => !m.read).length
   });
