@@ -9,10 +9,12 @@
     "date": "2026-04-14",
     "author": "MiRiDom",
     "createdAt": "2026-04-14T06:05:20.192Z",
-    "updatedAt": "2026-08-31T21:19:42.527Z",
+    "updatedAt": "2026-07-17T21:52:01.434Z",
     "tags": [
       "Organization"
-    ]
+    ],
+    "image": "",
+    "aRetelverser": "/uploads/a650144a-fc1d-44b2-a635-d13124e93347.jpg"
   },
   {
     "id": "625888f0-77c4-4525-b9f3-95bb686ce881",
@@ -24,11 +26,13 @@
     "date": "2026-04-07",
     "author": "MiRiDom",
     "createdAt": "2026-04-07T06:05:20.192Z",
-    "updatedAt": "2026-04-07T06:05:20.192Z",
+    "updatedAt": "2026-07-17T21:53:50.367Z",
     "tags": [
       "Report",
       "Caribbean",
       "Human rights"
-    ]
+    ],
+    "image": "",
+    "aRetelverser": "/uploads/ee749204-d574-4409-98da-c45334b6895f.jpg"
   }
 ]
